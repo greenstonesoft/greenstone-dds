@@ -1,0 +1,63 @@
+{
+    "domain_participant_qos": {
+        "participant_pub_cfg": {
+            "local_host": "192.168.8.210",
+            "domain_id": 112,
+            "participant_id": 21
+        },
+        "participant_sub_cfg": {
+            "local_host": "192.168.8.210",
+            "domain_id": 112,
+            "participant_id": 22
+        }
+    },
+    "writer_qos": {
+        "writer_cfg": {
+            "resource_limits": {
+                "max_samples": 50,
+                "max_instances": 1,
+                "max_samples_per_instance": 50
+            },
+            "durability": {
+                "kind": "VOLATILE_DURABILITY_QOS"
+            },
+            "history": {
+                "kind": "KEEP_ALL_HISTORY_QOS",
+                "depth": 1
+            },
+            "reliability": {
+                "kind": "RELIABLE_RELIABILITY_QOS",
+                "max_blocking_time": 100
+            },
+            "attributes": {
+                "comm_kind": 16,
+                "auto_op": true,
+                "enableZeroCopy": true,
+                "zeroCopyMemorySize": 104857600
+            }
+        }
+    },
+    "reader_qos": {
+        "reader_cfg": {
+            "resource_limits": {
+                "max_samples": 50,
+                "max_instances": 1,
+                "max_samples_per_instance": 50
+            },
+            "durability": {
+                "kind": "VOLATILE_DURABILITY_QOS"
+            },
+            "history": {
+                "kind": "KEEP_ALL_HISTORY_QOS",
+                "depth": 1
+            },
+            "reliability": {
+                "kind": "RELIABLE_RELIABILITY_QOS"
+            },
+            "attributes": {
+                "comm_kind": 16,
+                "auto_op": true
+            }
+        }
+    }
+}
