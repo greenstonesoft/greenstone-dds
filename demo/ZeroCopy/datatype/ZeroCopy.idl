@@ -1,0 +1,6 @@
+struct ZeroCopy
+{
+    @key unsigned short id;
+    unsigned long index;
+    char message[61000];
+};

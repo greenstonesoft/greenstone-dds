@@ -1,7 +1,0 @@
-struct TestMsg
-{
-	@key long key;
-	unsigned long index;
-	unsigned long length;
-	string message;
-};
