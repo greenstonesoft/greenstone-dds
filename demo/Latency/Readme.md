@@ -10,9 +10,9 @@ Follow the steps below to run this demo. Cmake with version equal or greater tha
 > make -j8  
 > cd ..
 
-**Step 2**: Modify the *config.json* file by filling ***local_host*** with the IP address that will be used for the communication. Port number is optional. Additionly, ensure that the ***domain_id*** is set to the same value for all the participants involved in the communication. 
+**Step 2**: Modify the *config.json* file by filling ***local_host*** and ***transport_locator_list*** with the IP address that will be used for the communication. Port number is optional. Additionly, ensure that the ***domain_id*** is set to the same value for all the participants involved in the communication. 
 
-To choose the communication mode, adjust the ***comm_kind*** and ***auto_op*** fields. For UDP, TCP and Shared Memory, set comm_kind to **1**, **4** and **16**, respectively. Setting ***auto_op*** to **true** means SWIFT DDS can automatically optimize the communication mode to Shared Memory if it detects that both publisher and subscriber are on the same machine, regardless of the ***comm_kind*** setting.
+To choose the communication mode, adjust the ***prefer_transport_kind*** and ***only_recv_by_udp*** fields. For UDP, TCP and Shared Memory, set the order of  ***UDPv4***,  ***SHM***, and  ***TCPv4*** in the prefer_transport_kind list. Setting ***only_recv_by_udp*** to **true** means SWIFT DDS can set the communication mode to UDP, regardless of the ***prefer_transport_kind*** setting. Setting ***only_recv_by_udp*** to **false** and  SHM is ranked first in the ***prefer_transport_kind*** list, means SWIFT DDS can automatically optimize the communication mode to Shared Memory if it detects that both publisher and subscriber are on the same machine.
 
 Modify the *payload.txt* to test the network latency performance under varied settings of ***payload_size*** and ***payload_count***.
 

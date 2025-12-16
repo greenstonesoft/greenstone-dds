@@ -361,7 +361,7 @@ WriterQosPtr ConfigParser::get_writer_qos_from_json(const char* writerConfigName
         for (size_t i = 0; i < tmp.size(); i++)
         {
             std::string kind_string = tmp[i];
-            std::cout << "writer kind " << kind_string <<std::endl;
+            // std::cout << "writer kind " << kind_string <<std::endl;
             if (kind_string == "TRANSPORT_KIND_UDPv4" || kind_string == "UDPv4")
             {
                 datawriterAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_UDPv4);
@@ -539,7 +539,7 @@ ReaderQosPtr ConfigParser::get_reader_qos_from_json(const char* readerConfigName
         {
             
             std::string kind_string = tmp[i];
-            std::cout << "reader kind " << kind_string <<std::endl;
+            // std::cout << "reader kind " << kind_string <<std::endl;
             if (kind_string == "TRANSPORT_KIND_UDPv4" || kind_string == "UDPv4")
             {
                 datareaderAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_UDPv4);
@@ -728,7 +728,7 @@ greenstone::dds::Locator_t ConfigParser::get_locator_from_address(const std::str
         ip = addr.substr(pos1, pos2 - pos1);
         port = atoi(addr.substr(pos2 + 1).c_str());
     }
-    std::cout << "unicast: kind=" << kind << ", ip=" << ip << ", port=" << port << std::endl;
+    // std::cout << "unicast: kind=" << kind << ", ip=" << ip << ", port=" << port << std::endl;
 
     return greenstone::dds::Locator_t(kind, port, (char*) ip.c_str());
 }
