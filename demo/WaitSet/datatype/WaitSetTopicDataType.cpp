@@ -1,10 +1,11 @@
 /**************************************************************
 * @file WaitSetTopicDataType.cpp
-* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2023
+* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2025
 * All rights reserved
 **************************************************************/
 
 #include "WaitSetTopicDataType.h"
+#include "swiftdds/rtps/CdrSize.h"
 
 WaitSetTopicDataType::WaitSetTopicDataType() : TopicDataType()
 {
@@ -17,7 +18,7 @@ WaitSetTopicDataType::~WaitSetTopicDataType()
 bool WaitSetTopicDataType::serialize(DdsCdr& cdr, void *data, std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value)
 {
 	WaitSet* pData = static_cast<WaitSet*>(data);
-	pData->serialize(cdr);
+	cdr.serialize(*pData);
 	void *addr{nullptr};
 	data_value->length(cdr.get_buf(&addr));
 	data_value->value(static_cast<octet *>(addr));
@@ -27,11 +28,11 @@ bool WaitSetTopicDataType::deserialize(DdsCdr& cdr, std::shared_ptr<greenstone::
 {
 	WaitSet* pData = static_cast<WaitSet*>(data);
 	cdr.set_buf(reinterpret_cast<void*>(data_value->value()), data_value->length());
-	pData->deserialize(cdr);
+	cdr.deserialize(*pData);
 	return true;
 }
 // The func of getKey is non-thread-safe
-bool WaitSetTopicDataType::get_key(void* data, InstanceHandle_t* ihandle)
+bool WaitSetTopicDataType::get_key(void* data, InstanceHandle_t* ihandle) noexcept
 {
 	if (!WaitSet::is_key_defined())
 	{
@@ -56,19 +57,22 @@ bool WaitSetTopicDataType::get_key(void* data, InstanceHandle_t* ihandle)
 	}
 	return true;
 }
-bool WaitSetTopicDataType::get_key(std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value, InstanceHandle_t* ihandle)
+bool WaitSetTopicDataType::get_key(std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value, InstanceHandle_t* ihandle) noexcept
 {
 	if (!WaitSet::is_key_defined())
 	{
 		return false;
 	}
-	WaitSet data;
+	WaitSet *data = new WaitSet{};
 	DdsCdr cdr;
-	deserialize(cdr,data_value,reinterpret_cast<void*>(&data));
-	get_key(reinterpret_cast<void*>(&data),ihandle);
+	deserialize(cdr,data_value,reinterpret_cast<void*>(data));
+	get_key(reinterpret_cast<void*>(data),ihandle);
+
+	delete data;
+
 	return true;
 }
-bool WaitSetTopicDataType::init_data_ptr(void* data)
+bool WaitSetTopicDataType::init_data_ptr(void* data) noexcept
 {
 	if (data == nullptr)
 	{
@@ -78,31 +82,32 @@ bool WaitSetTopicDataType::init_data_ptr(void* data)
 
 	return true;
 }
-uint32_t WaitSetTopicDataType::get_cdr_serialized_size(void *data)
+uint32_t WaitSetTopicDataType::get_cdr_serialized_size(void *data) noexcept
 {
 	if (data == nullptr)
 	{
 		return 0U;
 	}
 	WaitSet* pData = static_cast<WaitSet*>(data);
+	uint32_t max_size = pData->max_align_size(4U);
 
-	return pData->max_align_size(0U);
+	return greenstone::dds::CdrUtil::alignment_bytes(max_size, 4U);
 }
-bool WaitSetTopicDataType::is_with_key()
+bool WaitSetTopicDataType::is_with_key() noexcept
 {
 	return WaitSet::is_key_defined();
 }
-bool WaitSetTopicDataType::is_plain_types()
+bool WaitSetTopicDataType::is_plain_types() noexcept
 {
 	return WaitSet::is_plain_types();
 }
-void* WaitSetTopicDataType::create_data_resource()
+void* WaitSetTopicDataType::create_data_resource() noexcept
 {
 	WaitSet* pData = new WaitSet;
 
 	return pData;
 }
-void WaitSetTopicDataType::release_data_resource(void *data)
+void WaitSetTopicDataType::release_data_resource(void *data) noexcept
 {
 	if (data == nullptr)
 	{
@@ -112,3 +117,54 @@ void WaitSetTopicDataType::release_data_resource(void *data)
 	delete pData;
 	pData = nullptr;
 }
+greenstone::dds::SerializedPayloadHeader const WaitSetTopicDataType::get_serialized_payload_header() noexcept
+{
+	return WaitSet::get_serialized_payload_header();
+}
+
+void* const WaitSetTopicDataType::get_key_value_data(void * const data) noexcept
+{
+	if(!is_with_key())
+	{
+		return nullptr;
+	}
+	WaitSet* pData = reinterpret_cast<WaitSet*>(data);
+	WaitSet* newData = new WaitSet{};
+	newData->set_key_val(pData);
+
+	return newData;
+}
+
+void* const WaitSetTopicDataType::get_key_value_data(std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value) noexcept
+{
+	if(!is_with_key())
+	{
+		return nullptr;
+	}
+	WaitSet *data = new WaitSet{};
+	DdsCdr cdr;
+	deserialize(cdr,data_value,reinterpret_cast<void*>(data));
+
+	void* newData = get_key_value_data(data);
+
+	delete data;
+
+	return newData;
+}
+
+void WaitSetTopicDataType::copy_key_value_to_data(void const *const key_data, void *const data) noexcept
+{
+	if(!is_with_key())
+	{
+		return;
+	}
+	WaitSet* pData = reinterpret_cast<WaitSet*>(data);
+	WaitSet const* const keyData = reinterpret_cast<WaitSet const* const>(key_data);
+	pData->set_key_val(keyData);
+}
+
+uint32_t WaitSetTopicDataType::data_size_of() noexcept
+{
+	return sizeof(WaitSet);
+}
+

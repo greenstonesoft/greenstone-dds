@@ -1,63 +1,21 @@
 /**************************************************************
 * @file Helloworld.cpp
-* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2023
+* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2025
 * All rights reserved
 **************************************************************/
 
 #include "Helloworld.h"
-#include "rtps/CdrSize.h"
+#include "swiftdds/rtps/CdrSize.h"
 //#include <iostream>
 
-Helloworld::Helloworld()
+HelloWorld::HelloWorld()
 {
 	m_id = 0;
 	m_index = 0;
 
-	m_payloadHeader.representation_identifier[0] = 1;
-	m_payloadHeader.representation_identifier[1] = 0;
-	m_payloadHeader.representation_options[0] = 0;
-	m_payloadHeader.representation_options[1] = 0;
-}
-Helloworld::~Helloworld()
-{
-}
-Helloworld::Helloworld(const Helloworld &x)
-{
-	m_id = x.m_id;
-	m_index = x.m_index;
-	m_message = x.m_message;
-
-	m_payloadHeader = x.m_payloadHeader;
-}
-Helloworld::Helloworld(Helloworld &&x)
-{
-	m_id = x.m_id;
-	m_index = x.m_index;
-	m_message = std::move(x.m_message);
-
-	m_payloadHeader = x.m_payloadHeader;
-}
-Helloworld& Helloworld::operator=(const Helloworld &x)
-{
-	m_payloadHeader = x.m_payloadHeader;
-
-	m_id = x.m_id;
-	m_index = x.m_index;
-	m_message = x.m_message;
-	return *this;
-
-}
-Helloworld& Helloworld::operator=(Helloworld &&x)
-{
-	m_payloadHeader = x.m_payloadHeader;
-	m_id = x.m_id;
-	m_index = x.m_index;
-	m_message = std::move(x.m_message);
-	return *this;
-
 }
 
-DdsCdr& Helloworld::serialize(DdsCdr &cdr) const
+DdsCdr& HelloWorld::serialize(DdsCdr &cdr) const
 {
 	cdr.serialize(m_id);
 	cdr.serialize(m_index);
@@ -65,7 +23,24 @@ DdsCdr& Helloworld::serialize(DdsCdr &cdr) const
 
 	return cdr;
 }
-DdsCdr& Helloworld::deserialize(DdsCdr &cdr)
+uint32_t HelloWorld::serialize(void *const data, char *const payload_buf, uint32_t const payload_len)
+{
+	if((data == nullptr) || (payload_buf == nullptr) || (payload_len == 0U))
+	{
+		return 0U;
+	}
+	greenstone::dds::SerializedPayloadHeader const header{get_serialized_payload_header()};
+	memcpy(payload_buf, &header, 4U);
+	DdsCdr cdr;
+	cdr.set_buf(payload_buf, payload_len);
+	cdr.move_length(payload_len-4U);
+	HelloWorld* pData = static_cast<HelloWorld*>(data);
+	cdr.serialize(*pData);
+	void *addr{nullptr};
+	return cdr.get_buf(&addr);
+}
+
+DdsCdr& HelloWorld::deserialize(DdsCdr &cdr)
 {
 	cdr.deserialize(m_id);
 	cdr.deserialize(m_index);
@@ -73,22 +48,32 @@ DdsCdr& Helloworld::deserialize(DdsCdr &cdr)
 
 	return cdr;
 }
-bool Helloworld::is_key_defined()
+bool HelloWorld::deserialize(char *const payload_buf, uint32_t const payload_len, void *const data)
+{
+	HelloWorld* pData = static_cast<HelloWorld*>(data);
+	DdsCdr cdr;
+	cdr.set_buf(payload_buf, payload_len);
+	cdr.deserialize(*pData);
+	return true;
+}
+
+bool HelloWorld::is_key_defined()
 {
 	return true;
 
 }
-void Helloworld::serialize_key(DdsCdr &cdr) const
+void HelloWorld::serialize_key(DdsCdr &cdr) const
 {
 	cdr.serialize(m_id);
 
 }
-void Helloworld::serialize_key(char **buf,unsigned int *len)
+void HelloWorld::serialize_key(char **buf,unsigned int *len)
 {
+	static greenstone::dds::SerializedPayloadHeader payloadHeader{{0x00,0x01},{0x00,0x00}};
 	if(is_key_serialize_by_cdr())
 	{
 		DdsCdr cdr;
-		cdr.init(m_payloadHeader);
+		cdr.init(payloadHeader);
 		serialize_key(cdr);
 		*len = cdr.get_buf(reinterpret_cast<void**>(buf));
 	}
@@ -99,16 +84,16 @@ void Helloworld::serialize_key(char **buf,unsigned int *len)
 	}
 
 }
-bool Helloworld::is_key_serialize_by_cdr()
+bool HelloWorld::is_key_serialize_by_cdr()
 {
 	return false;
 
 }
-bool Helloworld::is_plain_types()
+bool HelloWorld::is_plain_types()
 {
 	return false;
 }
-uint32_t Helloworld::max_align_size(uint32_t const _cur_al) const
+uint32_t HelloWorld::max_align_size(uint32_t const _cur_al) const
 {
 	uint32_t maxSize = _cur_al;
 	maxSize = greenstone::dds::CdrUtil::alignment(maxSize, m_id);
@@ -117,45 +102,56 @@ uint32_t Helloworld::max_align_size(uint32_t const _cur_al) const
 	return maxSize;
 
 }
-void Helloworld::id(unsigned short _id)
+greenstone::dds::SerializedPayloadHeader const HelloWorld::get_serialized_payload_header()
+{
+	static greenstone::dds::SerializedPayloadHeader const header {{0x00,0x01},{0x00,0x00}};    // PLAIN_CDR, LITTLE_ENDIAN
+	return header;
+
+}
+void HelloWorld::set_key_val(HelloWorld const* const _data) noexcept
+{
+	this->m_id = _data->m_id;
+
+}
+void HelloWorld::id(unsigned short const _id)
 {
 	m_id = _id;
 }
-unsigned short Helloworld::id() const
+unsigned short HelloWorld::id() const
 {
 	return m_id;
 }
-unsigned short& Helloworld::id()
+unsigned short& HelloWorld::id()
 {
 	return m_id;
 }
 
-void Helloworld::index(uint32_t _index)
+void HelloWorld::index(uint32_t const _index)
 {
 	m_index = _index;
 }
-uint32_t Helloworld::index() const
+uint32_t HelloWorld::index() const
 {
 	return m_index;
 }
-uint32_t& Helloworld::index()
+uint32_t& HelloWorld::index()
 {
 	return m_index;
 }
 
-void Helloworld::message(const std::string &_message)
+void HelloWorld::message(std::string const &_message)
 {
 	m_message = _message;
 }
-void Helloworld::message(std::string &&_message)
+void HelloWorld::message(std::string &&_message)
 {
 	m_message = std::move(_message);
 }
-const std::string& Helloworld::message() const
+std::string const& HelloWorld::message() const
 {
 	return m_message;
 }
-std::string& Helloworld::message()
+std::string& HelloWorld::message()
 {
 	return m_message;
 }

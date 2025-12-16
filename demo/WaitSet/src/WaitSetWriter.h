@@ -8,7 +8,7 @@
 #define WAITSET_WRITER_H
 
 #include "WaitSetTopicDataType.h"
-#include "dcps/SwiftDdsExport.h"
+#include "swiftdds/dcps/SwiftDdsExport.h"
 
 /**
 * @class WaitSetWriter

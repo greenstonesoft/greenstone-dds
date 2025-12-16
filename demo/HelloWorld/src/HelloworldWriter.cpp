@@ -27,7 +27,7 @@ bool HelloworldWriter::init(const std::string& topicName)
 {
     // Create participant
     m_participant = ConfigParser::get_instance()->get_participant_from_json(
-        "participant_pub_cfg", m_participantListener, m_mask);
+        "participant_pub_cfg", nullptr, m_mask);
     if (m_participant == nullptr)
     {
         return false;

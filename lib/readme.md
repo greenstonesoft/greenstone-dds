@@ -1,8 +1,8 @@
 Release history of SWIFT DDS is listed below.
 
-**SWIFT DDS 2.0**  
-Release Date: 2023/04/27
-Commit Hash: b99faa0f106385ca9f4a0bde7446c1a90b36dee2
+**SWIFT DDS 3.0.5**  
+Release Date: 2025/12/15
+Commit Hash: bea7ea7dc8c73cea6b8ad9a9f6132539aaf024e4
 
 Release Note:  
 -- inital release

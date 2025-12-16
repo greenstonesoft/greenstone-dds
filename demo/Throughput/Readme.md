@@ -3,7 +3,7 @@ This demo showcases the method to test the network throughput performance of Gre
 
 Follow the steps below to run this demo. Cmake with version equal or greater than 3.5 is required.
 
-**Step 1**: Run the following commands to compile the project. Set ***TARGET_OS*** by adding *'-D TARGET_OS=<target_os>'* when executing *'cmake ..'* accroding the platform. There are four available values for ***TARGET_OS***, which correspond to different platforms: **LINUX_X86 (default)**, **LINUX_ARM**, **LINUX_TDA4**, and **QNX_ARM**. Upon successful compilation, an executable file named *Throughput* will be generated.
+**Step 1**: Run the following commands to compile the project. Set ***TARGET_OS*** by adding *'-D TARGET_OS=<target_os>'* when executing *'cmake ..'* accroding the platform. There are four available values for ***TARGET_OS***, which correspond to different platforms: **LINUX_X86_18 (default)**, **LINUX_X86_20**, **LINUX_X86_22**, **LINUX_X86_24**, and **LINUX_ARM**. Upon successful compilation, an executable file named *Throughput* will be generated.
 
 > mkdir build  
 > cd build  
@@ -32,8 +32,8 @@ The full command options can be checked by:
 > ./Throughput -h
 
 The test result will be presented in the format below including [Payload Size, Received Count, Loss Rate, Time Spent, Throughput].  
-> Payload:         16  B | Received:     500000 | Loss Rate:       0.00 % | Time Spent:       6612 ms | Throughput:       9.68 Mbps  
-> Payload:         32  B | Received:     500000 | Loss Rate:       0.00 % | Time Spent:       3137 ms | Throughput:      40.80 Mbps
+> Payload:         16  B | Received:     500000 | Loss Rate:       0.00 % | Time Spent:       1363 ms | Throughput:       46.94 Mbps  
+> Payload:         32  B | Received:     500000 | Loss Rate:       0.00 % | Time Spent:       1391 ms | Throughput:      91.96 Mbps
 
 Matching messages will be printed on the screen if sender and receiver match each other successfully. Otherwise, please double check IP address and domain_id. 
 

@@ -11,7 +11,7 @@
 #include "Throughput.h"
 #include "ThroughputTopicDataType.h"
 #include "GeneralListeners.h"
-#include "dcps/SwiftDdsExport.h"
+#include "swiftdds/dcps/SwiftDdsExport.h"
 #include "ThroughputPubBase.h"
 
 /**
@@ -44,7 +44,7 @@ private:
 		~PubReaderListener();
 
         // receive samples and notify send data
-		void on_data_available(greenstone::dds::DataReader* reader) noexcept;
+		void on_data_available(greenstone::dds::DataReader* reader) noexcept override;
 	private:
 		ThroughputPub* m_up;
 		Throughput m_msg;

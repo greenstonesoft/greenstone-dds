@@ -1,60 +1,17 @@
 /**************************************************************
 * @file ZeroCopy.cpp
-* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2023
+* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2025
 * All rights reserved
 **************************************************************/
 
 #include "ZeroCopy.h"
-#include "rtps/CdrSize.h"
+#include "swiftdds/rtps/CdrSize.h"
 //#include <iostream>
 
 ZeroCopy::ZeroCopy()
 {
 	m_id = 0;
 	m_index = 0;
-	m_message = {};
-
-	m_payloadHeader.representation_identifier[0] = 1;
-	m_payloadHeader.representation_identifier[1] = 0;
-	m_payloadHeader.representation_options[0] = 0;
-	m_payloadHeader.representation_options[1] = 0;
-}
-ZeroCopy::~ZeroCopy()
-{
-}
-ZeroCopy::ZeroCopy(const ZeroCopy &x)
-{
-	m_id = x.m_id;
-	m_index = x.m_index;
-	m_message = x.m_message;
-
-	m_payloadHeader = x.m_payloadHeader;
-}
-ZeroCopy::ZeroCopy(ZeroCopy &&x)
-{
-	m_id = x.m_id;
-	m_index = x.m_index;
-	m_message = std::move(x.m_message);
-
-	m_payloadHeader = x.m_payloadHeader;
-}
-ZeroCopy& ZeroCopy::operator=(const ZeroCopy &x)
-{
-	m_payloadHeader = x.m_payloadHeader;
-
-	m_id = x.m_id;
-	m_index = x.m_index;
-	m_message = x.m_message;
-	return *this;
-
-}
-ZeroCopy& ZeroCopy::operator=(ZeroCopy &&x)
-{
-	m_payloadHeader = x.m_payloadHeader;
-	m_id = x.m_id;
-	m_index = x.m_index;
-	m_message = std::move(x.m_message);
-	return *this;
 
 }
 
@@ -66,6 +23,23 @@ DdsCdr& ZeroCopy::serialize(DdsCdr &cdr) const
 
 	return cdr;
 }
+uint32_t ZeroCopy::serialize(void *const data, char *const payload_buf, uint32_t const payload_len)
+{
+	if((data == nullptr) || (payload_buf == nullptr) || (payload_len == 0U))
+	{
+		return 0U;
+	}
+	greenstone::dds::SerializedPayloadHeader const header{get_serialized_payload_header()};
+	memcpy(payload_buf, &header, 4U);
+	DdsCdr cdr;
+	cdr.set_buf(payload_buf, payload_len);
+	cdr.move_length(payload_len-4U);
+	ZeroCopy* pData = static_cast<ZeroCopy*>(data);
+	cdr.serialize(*pData);
+	void *addr{nullptr};
+	return cdr.get_buf(&addr);
+}
+
 DdsCdr& ZeroCopy::deserialize(DdsCdr &cdr)
 {
 	cdr.deserialize(m_id);
@@ -74,6 +48,15 @@ DdsCdr& ZeroCopy::deserialize(DdsCdr &cdr)
 
 	return cdr;
 }
+bool ZeroCopy::deserialize(char *const payload_buf, uint32_t const payload_len, void *const data)
+{
+	ZeroCopy* pData = static_cast<ZeroCopy*>(data);
+	DdsCdr cdr;
+	cdr.set_buf(payload_buf, payload_len);
+	cdr.deserialize(*pData);
+	return true;
+}
+
 bool ZeroCopy::is_key_defined()
 {
 	return true;
@@ -86,10 +69,11 @@ void ZeroCopy::serialize_key(DdsCdr &cdr) const
 }
 void ZeroCopy::serialize_key(char **buf,unsigned int *len)
 {
+	static greenstone::dds::SerializedPayloadHeader payloadHeader{{0x00,0x01},{0x00,0x00}};
 	if(is_key_serialize_by_cdr())
 	{
 		DdsCdr cdr;
-		cdr.init(m_payloadHeader);
+		cdr.init(payloadHeader);
 		serialize_key(cdr);
 		*len = cdr.get_buf(reinterpret_cast<void**>(buf));
 	}
@@ -118,7 +102,18 @@ uint32_t ZeroCopy::max_align_size(uint32_t const _cur_al) const
 	return maxSize;
 
 }
-void ZeroCopy::id(unsigned short _id)
+greenstone::dds::SerializedPayloadHeader const ZeroCopy::get_serialized_payload_header()
+{
+	static greenstone::dds::SerializedPayloadHeader const header {{0x00,0x01},{0x00,0x00}};    // PLAIN_CDR, LITTLE_ENDIAN
+	return header;
+
+}
+void ZeroCopy::set_key_val(ZeroCopy const* const _data) noexcept
+{
+	this->m_id = _data->m_id;
+
+}
+void ZeroCopy::id(unsigned short const _id)
 {
 	m_id = _id;
 }
@@ -131,7 +126,7 @@ unsigned short& ZeroCopy::id()
 	return m_id;
 }
 
-void ZeroCopy::index(uint32_t _index)
+void ZeroCopy::index(uint32_t const _index)
 {
 	m_index = _index;
 }
@@ -144,7 +139,7 @@ uint32_t& ZeroCopy::index()
 	return m_index;
 }
 
-void ZeroCopy::message(const std::array<char,61000> &_message)
+void ZeroCopy::message(std::array<char,61000> const &_message)
 {
 	m_message = _message;
 }
@@ -152,7 +147,7 @@ void ZeroCopy::message(std::array<char,61000> &&_message)
 {
 	m_message = std::move(_message);
 }
-const std::array<char,61000>& ZeroCopy::message() const
+std::array<char,61000> const& ZeroCopy::message() const
 {
 	return m_message;
 }

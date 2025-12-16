@@ -11,7 +11,7 @@
 #include "Latency.h"
 #include "LatencyTopicDataType.h"
 #include "GeneralListeners.h"
-#include "dcps/SwiftDdsExport.h"
+#include "swiftdds/dcps/SwiftDdsExport.h"
 #include "LatencyPubBase.h"
 
 /**
@@ -47,7 +47,7 @@ private:
 		~PubReaderListener();
 
 		// receive data from sub node and notify test function pub
-		void on_data_available(greenstone::dds::DataReader* reader) noexcept;
+		void on_data_available(greenstone::dds::DataReader* reader) noexcept override;
 	private:
 		LatencyPub* m_up;
 		Latency m_msgEcho;

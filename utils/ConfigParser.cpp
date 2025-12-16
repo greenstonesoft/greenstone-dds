@@ -105,17 +105,38 @@ ParticipantQosPtr ConfigParser::get_participant_qos_from_json(const char* partic
 
     auto jSub = m_j["domain_participant_qos"][participantConfigName];
 
-    participantAttr.use_builtin_transports(true);
-    participantAttr.spdp_attributes().metatraffic_unicast_locators().push_back(get_locator_from_address("127.0.0.1"));
+    // participantAttr.use_builtin_transports(true);
+    // participantAttr.spdp_attributes().metatraffic_unicast_locators().push_back(get_locator_from_address("127.0.0.1"));
 
+    participantAttr.async_thread_size(get_number<guint32_t>(3, jSub, "async_thread_size"));
+    
     participantAttr.shared_memory_size(get_number<guint32_t>(100 * 1024 * 1024, jSub, "shared_memory_size"));
     participantAttr.spdp_attributes().domain_id(get_number<guint32_t>(10, jSub, "domain_id"));
-    participantAttr.spdp_attributes().metatraffic_unicast_locators() = get_locator_list(
+    // localhost into spdp_attributes.metatraffic_unicast_locators
+    gstone::rtps::LocatorList_t temp = get_locator_list(
         participantAttr.spdp_attributes().metatraffic_unicast_locators(), jSub, "local_host");
+    for (size_t i = 0; i < temp.size(); i++)
+    {
+        participantAttr.spdp_attributes().add_meta_unicast_locator(temp[i]);
+    }
+    
     participantAttr.spdp_attributes().default_remote_unicast_locators(get_locator_list(
         participantAttr.spdp_attributes().default_remote_unicast_locators(), jSub, "remote_unicast_list"));
-    participantAttr.default_unicast_locatorlist(get_locator_list(
-        participantAttr.default_unicast_locatorlist(), jSub, "unicast_list"));
+
+    // unicast_list into unicast_transport_list
+    gstone::rtps::LocatorList_t tmp;
+    tmp = get_locator_list(tmp, jSub, "transport_locator_list");
+    for (size_t i = 0; i < tmp.size(); i++)
+    {
+        char addr[tmp[i].ADDRESS_SIZE];
+        for (size_t j = 0; j < tmp[i].ADDRESS_SIZE; j++)
+        {
+            addr[j] = (char) tmp[i].address()[j];
+        }
+        
+        participantAttr.add_unicast_transport(tmp[i].kind(), tmp[i].port(), addr);
+    }
+
     participantAttr.default_multicast_locatorlist(get_locator_list(
         participantAttr.default_multicast_locatorlist(), jSub, "multicast_list"));
     participantAttr.participant_id(get_number<guint32_t>(10, jSub, "participant_id"));
@@ -125,7 +146,7 @@ ParticipantQosPtr ConfigParser::get_participant_qos_from_json(const char* partic
             greenstone::dds::RecvMode_t::AsyncRecvMode, jSub, RECV_MODE_MAP, "RecvMode", "recv_sync"));
     participantAttr.used_wlp(get_bool(false, jSub, "useWLP"));
     participantAttr.enable_monitoring(get_bool(false, jSub, "enable_monitoring"));
-    participantAttr.spdp_attributes().domain_tag(get_string("DefaultTag", jSub, "domain_tag"));
+    // participantAttr.spdp_attributes().domain_tag(get_string("DefaultTag", jSub, "domain_tag"));
     
     sedpAttr.heartbeat_period(get_duration(greenstone::dds::Duration_t(2000), jSub, "heartbeat_period"));
     participantAttr.sedp_attributes(sedpAttr);
@@ -262,6 +283,14 @@ WriterQosPtr ConfigParser::get_writer_qos_from_json(const char* writerConfigName
         get_duration(greenstone::dds::Duration_t(100), jSub, "reliability", "max_blocking_time"));
     writerQos->reliability(reliability);
 
+    greenstone::dds::FlowControlQosPolicy flow_ctrl;
+    flow_ctrl.limits(
+        get_number<uint32_t>(0U, jSub, "flow_ctrl", "limits")
+    );
+    flow_ctrl.period(
+        get_number<uint32_t>(0U, jSub, "flow_ctrl", "period")
+    );
+
     greenstone::dds::OwnershipQosPolicy ownership;
     ownership.kind(
         get_enum<greenstone::dds::OwnershipQosPolicyKind>(
@@ -316,11 +345,51 @@ WriterQosPtr ConfigParser::get_writer_qos_from_json(const char* writerConfigName
     writerQos->user_data(userData);
 
     greenstone::dds::DataWriterAttributes datawriterAttr;
-    datawriterAttr.is_stateful(get_bool(true, jSub, "attributes", "stateful"));
+    if (get_bool(false, jSub, "attributes", "only_recv_by_udp")) {
+        datawriterAttr.only_recv_by_udp(true);
+    } else {
+        datawriterAttr.only_recv_by_udp(false);
+    }
+    std::vector<std::string> tmp;
+    tmp = get_string_sequence(tmp, jSub, "attributes", "prefer_transport_kind");
+    if (tmp.size() == 0)
+    {
+        // datawriterAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_CORE_SHM_R);
+        // datawriterAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_RPMSG_R);
+        // datawriterAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_SHM);
+    } else {
+        for (size_t i = 0; i < tmp.size(); i++)
+        {
+            std::string kind_string = tmp[i];
+            std::cout << "writer kind " << kind_string <<std::endl;
+            if (kind_string == "TRANSPORT_KIND_UDPv4" || kind_string == "UDPv4")
+            {
+                datawriterAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_UDPv4);
+            }
+            else if (kind_string == "TRANSPORT_KIND_TCPv4" || kind_string == "TCPv4")
+            {
+                datawriterAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_TCPv4);
+            }
+            else if (kind_string == "TRANSPORT_KIND_RPMSG_R" || kind_string == "TRANSPORT_KIND_RPMSG" || kind_string == "RPMSG_R" || kind_string == "RPMSG")
+            {
+                datawriterAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_RPMSG_R);
+            }
+            else if (kind_string == "TRANSPORT_KIND_CORE_SHM_R" || kind_string == "TRANSPORT_KIND_CORE_SHM" || kind_string == "CORE_SHM" || kind_string == "CORESHM")
+            {
+                datawriterAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_CORE_SHM_R);
+            }
+            else if (kind_string == "TRANSPORT_KIND_SHM" || kind_string == "SHM")
+            {
+                datawriterAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_SHM);
+            }
+        }
+    }
+    
+    // datawriterAttr.is_stateful(get_bool(true, jSub, "attributes", "stateful"));
     datawriterAttr.push_mode(get_bool(true, jSub, "attributes", "push_mode"));
     datawriterAttr.is_sync(get_bool(true, jSub, "attributes", "sync"));
-    datawriterAttr.comm_kind(get_number<uint32_t>(1, jSub, "attributes", "comm_kind"));
-    datawriterAttr.is_auto_op(get_bool(true, jSub, "attributes", "auto_op"));
+    // datawriterAttr.comm_kind(get_number<uint32_t>(1, jSub, "attributes", "comm_kind"));
+    // datawriterAttr.is_auto_op(get_bool(true, jSub, "attributes", "auto_op"));
     datawriterAttr.heartbeat_period(get_number<uint32_t>(4, jSub, "attributes", "heartbeat_period"));
     datawriterAttr.nack_response_delay(get_number<uint32_t>(1, jSub, "attributes", "nack_response_delay"));
     datawriterAttr.nack_supper_ression_duration(
@@ -328,8 +397,11 @@ WriterQosPtr ConfigParser::get_writer_qos_from_json(const char* writerConfigName
     datawriterAttr.history_cache_capacity(
         get_number<uint32_t>(100, jSub, "attributes", "history_cache_capacity"));
     datawriterAttr.max_frag_size(get_number<uint32_t>(65500, jSub, "attributes", "max_frag_size"));
-    datawriterAttr.data_channel_flow_ctl_band_width(
-        get_number<uint32_t>(0, jSub, "attributes", "channel_flow_ctrl"));
+    datawriterAttr.max_shm_frag_size(get_number<uint32_t>(34603008, jSub, "attributes", "max_shm_frag_size"));
+    // datawriterAttr.data_channel_flow_ctl_band_width(
+    //     get_number<uint32_t>(0, jSub, "attributes", "channel_flow_ctrl"));
+    // datawriterAttr.flow_ctl_window_unit(
+    //     get_number<uint32_t>(75, jSub, "attributes", "flow_ctl_window_unit"));
     datawriterAttr.hb_with_data_per_seq_num(
         get_number<uint32_t>(10, jSub, "attributes", "hbWithDataPerSeqNum"));
     datawriterAttr.batch_size(get_number<uint32_t>(10, jSub, "attributes", "batchSize"));
@@ -450,8 +522,48 @@ ReaderQosPtr ConfigParser::get_reader_qos_from_json(const char* readerConfigName
     readerQos->user_data(userData);
 
     greenstone::dds::DataReaderAttributes datareaderAttr;
-    datareaderAttr.comm_kind(get_number<uint32_t>(1, jSub, "attributes", "comm_kind"));
-    datareaderAttr.is_auto_op(get_bool(true, jSub, "attributes", "auto_op"));
+    if (get_bool(false, jSub, "attributes", "only_recv_by_udp")) {
+        datareaderAttr.only_recv_by_udp(true);
+    } else {
+        datareaderAttr.only_recv_by_udp(false);
+    }
+    std::vector<std::string> tmp;
+    tmp = get_string_sequence(tmp, jSub, "attributes", "prefer_transport_kind");
+    if (tmp.size() == 0)
+    {
+        // datareaderAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_CORE_SHM_R);
+        // datareaderAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_RPMSG_R);
+        // datareaderAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_SHM);
+    } else {
+        for (size_t i = 0; i < tmp.size(); i++)
+        {
+            
+            std::string kind_string = tmp[i];
+            std::cout << "reader kind " << kind_string <<std::endl;
+            if (kind_string == "TRANSPORT_KIND_UDPv4" || kind_string == "UDPv4")
+            {
+                datareaderAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_UDPv4);
+            }
+            else if (kind_string == "TRANSPORT_KIND_TCPv4" || kind_string == "TCPv4")
+            {
+                datareaderAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_TCPv4);
+            }
+            else if (kind_string == "TRANSPORT_KIND_RPMSG_R" || kind_string == "TRANSPORT_KIND_RPMSG" || kind_string == "RPMSG_R" || kind_string == "RPMSG")
+            {
+                datareaderAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_RPMSG_R);
+            }
+            else if (kind_string == "TRANSPORT_KIND_CORE_SHM_R" || kind_string == "TRANSPORT_KIND_CORE_SHM" || kind_string == "CORE_SHM" || kind_string == "CORESHM")
+            {
+                datareaderAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_CORE_SHM_R);
+            }
+            else if (kind_string == "TRANSPORT_KIND_SHM" || kind_string == "SHM")
+            {
+                datareaderAttr.push_back_prefer_transport_kind(gstone::rtps::TransportKind_t::TRANSPORT_KIND_SHM);
+            }
+        }
+    }    
+    // datareaderAttr.comm_kind(get_number<uint32_t>(1, jSub, "attributes", "comm_kind"));
+    // datareaderAttr.is_auto_op(get_bool(true, jSub, "attributes", "auto_op"));
     datareaderAttr.heartbeat_response_delay(
         get_duration(greenstone::dds::Duration_t(1), jSub, "attributes", "heartbeat_response_delay"));
     datareaderAttr.heartbeat_suppression_duration(
@@ -514,7 +626,7 @@ greenstone::dds::Publisher* ConfigParser::get_publisher_from_json(
     const greenstone::dds::StatusMask& mask)
 {
     PublisherQosPtr pubQos = get_publisher_qos_from_json(publisherConfigName);
-    greenstone::dds::Publisher* pubPtr = domainParticipant->create_publisher(*pubQos, listener, mask);
+    greenstone::dds::Publisher* pubPtr = domainParticipant->create_publisher(*pubQos, nullptr, mask);
     return pubPtr;
 }
 
@@ -525,7 +637,7 @@ greenstone::dds::Subscriber* ConfigParser::get_subscriber_from_json(
     const greenstone::dds::StatusMask& mask)
 {
     SubscriberQosPtr subQos = get_subscriber_qos_from_json(subscriberConfigName);
-    greenstone::dds::Subscriber* subPtr = domainParticipant->create_subscriber(*subQos, listener, mask);
+    greenstone::dds::Subscriber* subPtr = domainParticipant->create_subscriber(*subQos, nullptr, mask);
     return subPtr;
 }
 
@@ -569,21 +681,56 @@ greenstone::dds::Topic* ConfigParser::get_topic_from_json(
 
 greenstone::dds::Locator_t ConfigParser::get_locator_from_address(const std::string& addr)
 {
+    gint32_t kind;
     std::string ip;
     uint32_t port;
 
-    auto pos = addr.find(":");
-    if (pos == addr.npos)
+    auto pos1 = addr.find("@");
+    if (pos1 == addr.npos)
     {
-        ip = addr;
+        kind = greenstone::dds::LOCATOR_KIND_UDPv4;
+        pos1 = 0;
+    }
+    else
+    {
+        std::string kind_string = addr.substr(0, pos1);
+        if (kind_string == "LOCATOR_KIND_UDPv4" || kind_string == "UDPv4")
+        {
+            kind = greenstone::dds::LOCATOR_KIND_UDPv4;
+        }
+        else if (kind_string == "LOCATOR_KIND_TCPv4" || kind_string == "TCPv4")
+        {
+            kind = greenstone::dds::LOCATOR_KIND_TCPv4;
+        }
+        else if (kind_string == "LOCATOR_KIND_RPMSG_A" || kind_string == "LOCATOR_KIND_RPMSG" || kind_string == "RPMSG_A" || kind_string == "RPMSG")
+        {
+            kind = greenstone::dds::LOCATOR_KIND_RPMSG_A;
+        }
+        else if (kind_string == "LOCATOR_KIND_CORE_SHM_A" || kind_string == "LOCATOR_KIND_CORE_SHM" || kind_string == "CORE_SHM" || kind_string == "CORESHM")
+        {
+            kind = greenstone::dds::LOCATOR_KIND_CORE_SHM_A;
+        }
+        else if (kind_string == "LOCATOR_KIND_SHM" || kind_string == "SHM")
+        {
+            kind = greenstone::dds::LOCATOR_KIND_SHM;
+        }
+        pos1++;
+    }
+
+    auto pos2 = addr.find(":");
+    if (pos2 == addr.npos)
+    {
+        ip = addr.substr(pos1);
         port = 0;
     }
     else
     {
-        ip = addr.substr(0, pos);
-        port = atoi(addr.substr(pos + 1).c_str());
+        ip = addr.substr(pos1, pos2 - pos1);
+        port = atoi(addr.substr(pos2 + 1).c_str());
     }
-    return greenstone::dds::Locator_t(greenstone::dds::LOCATOR_KIND_UDPv4, port, (char*) ip.c_str());
+    std::cout << "unicast: kind=" << kind << ", ip=" << ip << ", port=" << port << std::endl;
+
+    return greenstone::dds::Locator_t(kind, port, (char*) ip.c_str());
 }
 
 greenstone::dds::LocatorList_t ConfigParser::get_locator_list(
@@ -756,6 +903,37 @@ std::vector<std::string> ConfigParser::get_string_sequence(
     }
     ret = jValue.get<std::vector<std::string>>();
     return ret;
+}
+
+template <typename T>
+std::array<T, 100> ConfigParser::get_number_sequence(
+    T defaultValue,
+    json& jseq,
+    const std::string& key1)
+{
+    std::array<T, 100> tempArray;
+    tempArray.fill(defaultValue);
+    if (jseq.contains(key1))
+    {
+        for (size_t seqSize = 0; seqSize < jseq[key1].get<std::vector<T>>().size() && seqSize < 100; seqSize++)
+        {
+            if (seqSize == 0)
+            {
+                tempArray.fill(jseq[key1].get<std::vector<T>>()[0]);
+            }
+            else
+            {
+                tempArray[seqSize] = jseq[key1].get<std::vector<T>>()[seqSize];
+            }
+        }      
+    }
+    // std::cout << key1 << ": " << std::endl; 
+    // for (size_t i = 0; i < 20; i++)
+    // {
+    //     std::cout << tempArray[i] << std::endl;
+    // }
+    
+    return tempArray;
 }
 
 void ConfigParser::set_security_qos(ParticipantQosPtr qos)

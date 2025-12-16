@@ -1,64 +1,34 @@
 {
     "domain_participant_qos": {
         "participant_pub_cfg": {
-            "local_host": "192.168.8.209",
+            "local_host": "192.168.80.209",
             "domain_id": 111,
-            "participant_id": 25,
-            "heartbeat_period": 4,
-            "lease_duration": 30000,
-            "recv_sync": false,
+            "participant_id": 120,
             "remote_unicast_list": [],
-            "unicast_list": [],
+            "transport_locator_list": ["UDPv4@192.168.80.209:0", "SHM@192.168.80.209:0", "TCPv4@192.168.80.209:0"],
             "multicast_list": [],
-            "shared_memory_size": 10485760,
-            "useWLP": false,
-            "entity_factory": {"autoenable_created_entities": true},
-            "user_data": {"value": "user_data_example_participant_pub"},
-            "enable_security": false,
-            "enable_monitoring": false
+            "recv_sync": false,
+            "async_thread_size": 3,
+            "shared_memory_size": 104857600
         },
         "participant_sub_cfg": {
-            "local_host": "192.168.8.209",
+            "local_host": "192.168.80.209",
             "domain_id": 111,
-            "participant_id": 26,
-            "heartbeat_period": 4,
-            "lease_duration": 30000,
-            "recv_sync": false,
+            "participant_id": 120,
             "remote_unicast_list": [],
-            "unicast_list": [],
+            "transport_locator_list": ["UDPv4@192.168.80.209:0", "SHM@192.168.80.209:0", "TCPv4@192.168.80.209:0"],
             "multicast_list": [],
-            "shared_memory_size": 10485760,
-            "useWLP": false,
-            "entity_factory": {"autoenable_created_entities": true},
-            "user_data": {"value": "user_data_example_participant_sub"},
-            "enable_security": false,
-            "enable_monitoring": false
+            "recv_sync": false,
+            "async_thread_size": 3,
+            "shared_memory_size": 104857600
         }
     },
     "publisher_qos": {
         "publisher_cfg": {
-            "partition": {
-                "value": []
-            },
-            "entity_factory": {
-                "autoenable_created_entities": true
-            },
-            "group_data": {
-                "value": "group_data_example_publisher"
-            }
         }
     },
     "subscriber_qos": {
         "subscriber_cfg": {
-            "partition": {
-                "value": []
-            },
-            "entity_factory": {
-                "autoenable_created_entities": true
-            },
-            "group_data": {
-                "value": "group_data_example_subscriber"
-            }
         }
     },
     "writer_qos": {
@@ -111,19 +81,19 @@
                 "value": "user_data_example_writer"
             },
             "attributes": {
-                "push_mode": true,
                 "sync": true,
-                "comm_kind": 1,
-                "auto_op": false,
+                "prefer_transport_kind": [
+                    "UDPv4",
+                    "SHM",
+                    "TCPv4"
+                ],
+                "only_recv_by_udp": true,
                 "heartbeat_period": 4,
-                "nack_response_delay": 1,
-                "nack_suppression_duration": 1,
-                "history_cache_capacity": 100,
-                "max_frag_size": 65500,
-                "channel_flow_ctrl": 0,
                 "hbWithDataPerSeqNum": 10,
-                "batchSize": 10,
+                "batchSize": 0,
                 "enableZeroCopy": false,
+                "max_frag_size": 65500,
+                "max_shm_frag_size": 34603008,
                 "zeroCopyMemorySize": 104857600,
                 "enableGroupSend": false,
                 "enableTs": false
@@ -174,19 +144,19 @@
                 "value": "user_data_example_reader"
             },
             "attributes": {
-                "comm_kind": 1,
-                "auto_op": false,
+                "prefer_transport_kind": [
+                    "UDPv4",
+                    "SHM",
+                    "TCPv4"
+                ],
+                "only_recv_by_udp": true,
                 "heartbeat_response_delay": 1,
-                "heartbeat_suppression_duration": 1,
                 "ack_with_data_per_seq_num": 10
             }
         }
     },
     "topic_qos": {
         "topic_cfg": {
-            "topic_data": {
-                "value": "topic_data_example"
-            }
         }
     }    
 }

@@ -51,7 +51,7 @@ private:
     public:
         MyDataReaderListener() {}
         ~MyDataReaderListener() {}
-        void on_data_available(greenstone::dds::DataReader* reader) noexcept;
+        void on_data_available(greenstone::dds::DataReader* reader) noexcept override;
     public:
         uint32_t m_received {0};
     }* m_readerListener;

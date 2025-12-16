@@ -8,7 +8,7 @@
 #define GENERAL_LISTENERS_H
 
 #include <atomic>
-#include "dcps/SwiftDdsExport.h"
+#include "swiftdds/dcps/SwiftDdsExport.h"
 
 /**
 * @class GeneralParticipantListener
@@ -28,7 +28,8 @@ public:
     // Callback function on_participant_matched
 	gvoid_t on_participant_matched(
                 greenstone::dds::DomainParticipant* a_participant, 
-                greenstone::dds::RemoteParticipantInfo const &a_remoteInfo) noexcept override;
+				dds::topic::ParticipantBuiltinTopicData const &a_remoteData, 
+                greenstone::dds::RemoteParticipantInfo const &a_remoteInfo) noexcept;
 
     // Get number of matched participants
 	uint32_t get_number_of_matched() const
@@ -62,7 +63,7 @@ public:
         greenstone::dds::SubscriptionMatchedStatus const& status) noexcept override;
 
 	// Callback function on_data_available
-	void on_data_available(greenstone::dds::DataReader* reader) noexcept override {}
+	// void on_data_available(dds::sub::DataReader* reader) noexcept override { std::cout << "on_data_available" << std::endl; }
 
 	// Callback function on_liveliness_changed
 	void on_liveliness_changed(
@@ -85,9 +86,9 @@ public:
         greenstone::dds::SampleRejectedStatus const& status) noexcept override;
 
 	// Callback function on_sample_lost
-	void on_sample_lost(
-		greenstone::dds::DataReader* reader,
-        greenstone::dds::SampleLostStatus const& status) noexcept override;
+	// void on_sample_lost(
+	// 	greenstone::dds::DataReader* reader,
+    //     greenstone::dds::SampleLostStatus const& status) noexcept override;
 
 	// Get number of matched DataWriters
 	uint32_t get_number_of_matched() const

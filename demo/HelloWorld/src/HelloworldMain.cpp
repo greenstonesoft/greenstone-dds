@@ -60,7 +60,7 @@ inline ParsedArguments parse_arguments(int argc, char* argv[])
     parsedArguments.cfgPath = "config.json";
     parsedArguments.sensorId = 0;
     parsedArguments.numOfInstances = 1;
-    parsedArguments.topicName = "Helloworld";
+    parsedArguments.topicName = "HelloWorld";
     parsedArguments.dataByte = 60000;
     parsedArguments.sampleCount = (std::numeric_limits<uint32_t>::max)();
     parsedArguments.sleepTime = 1000;

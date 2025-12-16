@@ -1,11 +1,11 @@
 /**************************************************************
 * @file Latency.cpp
-* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2023
+* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2025
 * All rights reserved
 **************************************************************/
 
 #include "Latency.h"
-#include "rtps/CdrSize.h"
+#include "swiftdds/rtps/CdrSize.h"
 //#include <iostream>
 
 Latency::Latency()
@@ -13,52 +13,6 @@ Latency::Latency()
 	m_key = 0;
 	m_index = 0;
 	m_length = 0;
-
-	m_payloadHeader.representation_identifier[0] = 1;
-	m_payloadHeader.representation_identifier[1] = 0;
-	m_payloadHeader.representation_options[0] = 0;
-	m_payloadHeader.representation_options[1] = 0;
-}
-Latency::~Latency()
-{
-}
-Latency::Latency(const Latency &x)
-{
-	m_key = x.m_key;
-	m_index = x.m_index;
-	m_length = x.m_length;
-	m_message = x.m_message;
-
-	m_payloadHeader = x.m_payloadHeader;
-}
-Latency::Latency(Latency &&x)
-{
-	m_key = x.m_key;
-	m_index = x.m_index;
-	m_length = x.m_length;
-	m_message = std::move(x.m_message);
-
-	m_payloadHeader = x.m_payloadHeader;
-}
-Latency& Latency::operator=(const Latency &x)
-{
-	m_payloadHeader = x.m_payloadHeader;
-
-	m_key = x.m_key;
-	m_index = x.m_index;
-	m_length = x.m_length;
-	m_message = x.m_message;
-	return *this;
-
-}
-Latency& Latency::operator=(Latency &&x)
-{
-	m_payloadHeader = x.m_payloadHeader;
-	m_key = x.m_key;
-	m_index = x.m_index;
-	m_length = x.m_length;
-	m_message = std::move(x.m_message);
-	return *this;
 
 }
 
@@ -71,6 +25,23 @@ DdsCdr& Latency::serialize(DdsCdr &cdr) const
 
 	return cdr;
 }
+uint32_t Latency::serialize(void *const data, char *const payload_buf, uint32_t const payload_len)
+{
+	if((data == nullptr) || (payload_buf == nullptr) || (payload_len == 0U))
+	{
+		return 0U;
+	}
+	greenstone::dds::SerializedPayloadHeader const header{get_serialized_payload_header()};
+	memcpy(payload_buf, &header, 4U);
+	DdsCdr cdr;
+	cdr.set_buf(payload_buf, payload_len);
+	cdr.move_length(payload_len-4U);
+	Latency* pData = static_cast<Latency*>(data);
+	cdr.serialize(*pData);
+	void *addr{nullptr};
+	return cdr.get_buf(&addr);
+}
+
 DdsCdr& Latency::deserialize(DdsCdr &cdr)
 {
 	cdr.deserialize(m_key);
@@ -80,30 +51,26 @@ DdsCdr& Latency::deserialize(DdsCdr &cdr)
 
 	return cdr;
 }
+bool Latency::deserialize(char *const payload_buf, uint32_t const payload_len, void *const data)
+{
+	Latency* pData = static_cast<Latency*>(data);
+	DdsCdr cdr;
+	cdr.set_buf(payload_buf, payload_len);
+	cdr.deserialize(*pData);
+	return true;
+}
+
 bool Latency::is_key_defined()
 {
-	return true;
+	return false;
 
 }
 void Latency::serialize_key(DdsCdr &cdr) const
 {
-	cdr.serialize(m_key);
 
 }
 void Latency::serialize_key(char **buf,unsigned int *len)
 {
-	if(is_key_serialize_by_cdr())
-	{
-		DdsCdr cdr;
-		cdr.init(m_payloadHeader);
-		serialize_key(cdr);
-		*len = cdr.get_buf(reinterpret_cast<void**>(buf));
-	}
-	else
-	{
-		*buf = reinterpret_cast<char*>(&m_key);
-		*len = sizeof(int32_t);
-	}
 
 }
 bool Latency::is_key_serialize_by_cdr()
@@ -125,7 +92,17 @@ uint32_t Latency::max_align_size(uint32_t const _cur_al) const
 	return maxSize;
 
 }
-void Latency::key(int32_t _key)
+greenstone::dds::SerializedPayloadHeader const Latency::get_serialized_payload_header()
+{
+	static greenstone::dds::SerializedPayloadHeader const header {{0x00,0x01},{0x00,0x00}};    // PLAIN_CDR, LITTLE_ENDIAN
+	return header;
+
+}
+void Latency::set_key_val(Latency const* const _data) noexcept
+{
+
+}
+void Latency::key(int32_t const _key)
 {
 	m_key = _key;
 }
@@ -138,7 +115,7 @@ int32_t& Latency::key()
 	return m_key;
 }
 
-void Latency::index(uint32_t _index)
+void Latency::index(uint32_t const _index)
 {
 	m_index = _index;
 }
@@ -151,7 +128,7 @@ uint32_t& Latency::index()
 	return m_index;
 }
 
-void Latency::length(uint32_t _length)
+void Latency::length(uint32_t const _length)
 {
 	m_length = _length;
 }
@@ -164,7 +141,7 @@ uint32_t& Latency::length()
 	return m_length;
 }
 
-void Latency::message(const std::string &_message)
+void Latency::message(std::string const &_message)
 {
 	m_message = _message;
 }
@@ -172,7 +149,7 @@ void Latency::message(std::string &&_message)
 {
 	m_message = std::move(_message);
 }
-const std::string& Latency::message() const
+std::string const& Latency::message() const
 {
 	return m_message;
 }

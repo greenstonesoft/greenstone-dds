@@ -1,14 +1,34 @@
 {
     "domain_participant_qos": {
         "participant_pub_cfg": {
-            "local_host": "192.168.8.210",
-            "domain_id": 114,
-            "participant_id": 21
+            "local_host": "192.168.80.209",
+            "domain_id": 111,
+            "participant_id": 120,
+            "remote_unicast_list": [],
+            "transport_locator_list": ["UDPv4@192.168.80.209:0", "SHM@192.168.80.209:0", "TCPv4@192.168.80.209:0"],
+            "multicast_list": [],
+            "recv_sync": false,
+            "async_thread_size": 3,
+            "shared_memory_size": 104857600
         },
         "participant_sub_cfg": {
-            "local_host": "192.168.8.210",
-            "domain_id": 114,
-            "participant_id": 22
+            "local_host": "192.168.80.209",
+            "domain_id": 111,
+            "participant_id": 120,
+            "remote_unicast_list": [],
+            "transport_locator_list": ["UDPv4@192.168.80.209:0", "SHM@192.168.80.209:0", "TCPv4@192.168.80.209:0"],
+            "multicast_list": [],
+            "recv_sync": false,
+            "async_thread_size": 3,
+            "shared_memory_size": 104857600
+        }
+    },
+    "publisher_qos": {
+        "publisher_cfg": {
+        }
+    },
+    "subscriber_qos": {
+        "subscriber_cfg": {
         }
     },
     "writer_qos": {
@@ -26,11 +46,57 @@
                 "depth": 1
             },
             "reliability": {
-                "kind": "RELIABLE_RELIABILITY_QOS"
+                "kind": "RELIABLE_RELIABILITY_QOS",
+                "max_blocking_time": 100
+            },
+            "ownership": {
+                "kind": "SHARED_OWNERSHIP_QOS"
+            },
+            "ownership_strength": {
+                "value": 20
+            },
+            "liveliness": {
+                "kind": "AUTOMATIC_LIVELINESS_QOS",
+                "lease_duration": "Inf"
+            },
+            "deadline": {
+                "period": "Inf"
+            },
+            "lifespan": {
+                "duration": 0
+            },
+            "latency_budget": {
+                "duration": 0
+            },
+            "transport_priority": {
+                "value": 0
+            },
+            "destination_order": {
+                "kind": "BY_RECEPTION_TIMESTAMP_DESTINATIONORDER_QOS"
+            },
+            "writer_data_lifecycle": {
+                "autodispose_unregistered_instances": true
+            },
+            "user_data": {
+                "value": "user_data_example_writer"
             },
             "attributes": {
-                "comm_kind": 1,
-                "auto_op": false
+                "sync": true,
+                "prefer_transport_kind": [
+                    "SHM",
+                    "UDPv4",
+                    "TCPv4"
+                ],
+                "only_recv_by_udp": false,
+                "heartbeat_period": 4,
+                "hbWithDataPerSeqNum": 10,
+                "batchSize": 0,
+                "enableZeroCopy": false,
+                "max_frag_size": 65500,
+                "max_shm_frag_size": 34603008,
+                "zeroCopyMemorySize": 104857600,
+                "enableGroupSend": false,
+                "enableTs": false
             }
         }
     },
@@ -51,10 +117,46 @@
             "reliability": {
                 "kind": "RELIABLE_RELIABILITY_QOS"
             },
+            "ownership": {
+                "kind": "SHARED_OWNERSHIP_QOS"
+            },
+            "liveliness": {
+                "kind": "AUTOMATIC_LIVELINESS_QOS",
+                "lease_duration": "Inf"
+            },
+            "deadline": {
+                "period": "Inf"
+            },
+            "latency_budget": {
+                "duration": 0
+            },
+            "destination_order": {
+                "kind": "BY_RECEPTION_TIMESTAMP_DESTINATIONORDER_QOS"
+            },
+            "time_based_filter": {
+                "minimum_separation": 0
+            },
+            "reader_data_lifecycle": {
+                "autopurge_disposed_samples_delay": "Inf",
+                "autopurge_nowriter_samples_delay": "Inf"
+            },
+            "user_data": {
+                "value": "user_data_example_reader"
+            },
             "attributes": {
-                "comm_kind": 1,
-                "auto_op": false
+                "prefer_transport_kind": [
+                    "SHM",
+                    "UDPv4",
+                    "TCPv4"
+                ],
+                "only_recv_by_udp": false,
+                "heartbeat_response_delay": 1,
+                "ack_with_data_per_seq_num": 10
             }
         }
-    }
+    },
+    "topic_qos": {
+        "topic_cfg": {
+        }
+    }    
 }

@@ -1,43 +1,44 @@
 /**************************************************************
 * @file HelloworldTopicDataType.cpp
-* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2023
+* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2025
 * All rights reserved
 **************************************************************/
 
 #include "HelloworldTopicDataType.h"
+#include "swiftdds/rtps/CdrSize.h"
 
-HelloworldTopicDataType::HelloworldTopicDataType() : TopicDataType()
+HelloWorldTopicDataType::HelloWorldTopicDataType() : TopicDataType()
 {
-	set_name("HelloworldTopicDataType");
+	set_name("HelloWorldTopicDataType");
 }
-HelloworldTopicDataType::~HelloworldTopicDataType()
+HelloWorldTopicDataType::~HelloWorldTopicDataType()
 {
 
 }
-bool HelloworldTopicDataType::serialize(DdsCdr& cdr, void *data, std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value)
+bool HelloWorldTopicDataType::serialize(DdsCdr& cdr, void *data, std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value)
 {
-	Helloworld* pData = static_cast<Helloworld*>(data);
-	pData->serialize(cdr);
+	HelloWorld* pData = static_cast<HelloWorld*>(data);
+	cdr.serialize(*pData);
 	void *addr{nullptr};
 	data_value->length(cdr.get_buf(&addr));
 	data_value->value(static_cast<octet *>(addr));
 	return true;
 }
-bool HelloworldTopicDataType::deserialize(DdsCdr& cdr, std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value, void *data)
+bool HelloWorldTopicDataType::deserialize(DdsCdr& cdr, std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value, void *data)
 {
-	Helloworld* pData = static_cast<Helloworld*>(data);
+	HelloWorld* pData = static_cast<HelloWorld*>(data);
 	cdr.set_buf(reinterpret_cast<void*>(data_value->value()), data_value->length());
-	pData->deserialize(cdr);
+	cdr.deserialize(*pData);
 	return true;
 }
 // The func of getKey is non-thread-safe
-bool HelloworldTopicDataType::get_key(void* data, InstanceHandle_t* ihandle)
+bool HelloWorldTopicDataType::get_key(void* data, InstanceHandle_t* ihandle) noexcept
 {
-	if (!Helloworld::is_key_defined())
+	if (!HelloWorld::is_key_defined())
 	{
 		return false;
 	}
-	Helloworld* pData = static_cast<Helloworld*>(data);
+	HelloWorld* pData = static_cast<HelloWorld*>(data);
 	unsigned int length;
 	char *buf = nullptr;
 	pData->serialize_key(&buf,&length);
@@ -56,59 +57,114 @@ bool HelloworldTopicDataType::get_key(void* data, InstanceHandle_t* ihandle)
 	}
 	return true;
 }
-bool HelloworldTopicDataType::get_key(std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value, InstanceHandle_t* ihandle)
+bool HelloWorldTopicDataType::get_key(std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value, InstanceHandle_t* ihandle) noexcept
 {
-	if (!Helloworld::is_key_defined())
+	if (!HelloWorld::is_key_defined())
 	{
 		return false;
 	}
-	Helloworld data;
+	HelloWorld *data = new HelloWorld{};
 	DdsCdr cdr;
-	deserialize(cdr,data_value,reinterpret_cast<void*>(&data));
-	get_key(reinterpret_cast<void*>(&data),ihandle);
+	deserialize(cdr,data_value,reinterpret_cast<void*>(data));
+	get_key(reinterpret_cast<void*>(data),ihandle);
+
+	delete data;
+
 	return true;
 }
-bool HelloworldTopicDataType::init_data_ptr(void* data)
+bool HelloWorldTopicDataType::init_data_ptr(void* data) noexcept
 {
 	if (data == nullptr)
 	{
 		return false;
 	}
-	new(data)Helloworld;
+	new(data)HelloWorld;
 
 	return true;
 }
-uint32_t HelloworldTopicDataType::get_cdr_serialized_size(void *data)
+uint32_t HelloWorldTopicDataType::get_cdr_serialized_size(void *data) noexcept
 {
 	if (data == nullptr)
 	{
 		return 0U;
 	}
-	Helloworld* pData = static_cast<Helloworld*>(data);
+	HelloWorld* pData = static_cast<HelloWorld*>(data);
+	uint32_t max_size = pData->max_align_size(4U);
 
-	return pData->max_align_size(0U);
+	return greenstone::dds::CdrUtil::alignment_bytes(max_size, 4U);
 }
-bool HelloworldTopicDataType::is_with_key()
+bool HelloWorldTopicDataType::is_with_key() noexcept
 {
-	return Helloworld::is_key_defined();
+	return HelloWorld::is_key_defined();
 }
-bool HelloworldTopicDataType::is_plain_types()
+bool HelloWorldTopicDataType::is_plain_types() noexcept
 {
-	return Helloworld::is_plain_types();
+	return HelloWorld::is_plain_types();
 }
-void* HelloworldTopicDataType::create_data_resource()
+void* HelloWorldTopicDataType::create_data_resource() noexcept
 {
-	Helloworld* pData = new Helloworld;
+	HelloWorld* pData = new HelloWorld;
 
 	return pData;
 }
-void HelloworldTopicDataType::release_data_resource(void *data)
+void HelloWorldTopicDataType::release_data_resource(void *data) noexcept
 {
 	if (data == nullptr)
 	{
 		return;
 	}
-	Helloworld* pData = reinterpret_cast<Helloworld*>(data);
+	HelloWorld* pData = reinterpret_cast<HelloWorld*>(data);
 	delete pData;
 	pData = nullptr;
 }
+greenstone::dds::SerializedPayloadHeader const HelloWorldTopicDataType::get_serialized_payload_header() noexcept
+{
+	return HelloWorld::get_serialized_payload_header();
+}
+
+void* const HelloWorldTopicDataType::get_key_value_data(void * const data) noexcept
+{
+	if(!is_with_key())
+	{
+		return nullptr;
+	}
+	HelloWorld* pData = reinterpret_cast<HelloWorld*>(data);
+	HelloWorld* newData = new HelloWorld{};
+	newData->set_key_val(pData);
+
+	return newData;
+}
+
+void* const HelloWorldTopicDataType::get_key_value_data(std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value) noexcept
+{
+	if(!is_with_key())
+	{
+		return nullptr;
+	}
+	HelloWorld *data = new HelloWorld{};
+	DdsCdr cdr;
+	deserialize(cdr,data_value,reinterpret_cast<void*>(data));
+
+	void* newData = get_key_value_data(data);
+
+	delete data;
+
+	return newData;
+}
+
+void HelloWorldTopicDataType::copy_key_value_to_data(void const *const key_data, void *const data) noexcept
+{
+	if(!is_with_key())
+	{
+		return;
+	}
+	HelloWorld* pData = reinterpret_cast<HelloWorld*>(data);
+	HelloWorld const* const keyData = reinterpret_cast<HelloWorld const* const>(key_data);
+	pData->set_key_val(keyData);
+}
+
+uint32_t HelloWorldTopicDataType::data_size_of() noexcept
+{
+	return sizeof(HelloWorld);
+}
+

@@ -11,7 +11,7 @@
 #include "Throughput.h"
 #include "ThroughputTopicDataType.h"
 #include "GeneralListeners.h"
-#include "dcps/SwiftDdsExport.h"
+#include "swiftdds/dcps/SwiftDdsExport.h"
 #include "ThroughputSubBase.h"
 
 /**
@@ -40,7 +40,7 @@ private:
 		~SubReaderListener();
 
         // receive data and calculate throughput
-		void on_data_available(greenstone::dds::DataReader* reader) noexcept;
+		void on_data_available(greenstone::dds::DataReader* reader) noexcept override;
 	private:
 		ThroughputSub* m_up;
 		greenstone::dds::DataWriter* m_writerEcho;

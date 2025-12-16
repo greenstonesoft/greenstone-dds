@@ -8,7 +8,7 @@
 #define WAITSET_READER_H
 
 #include "WaitSetTopicDataType.h"
-#include "dcps/SwiftDdsExport.h"
+#include "swiftdds/dcps/SwiftDdsExport.h"
 
 /**
 * @class WaitSetReader

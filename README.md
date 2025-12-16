@@ -1,4 +1,4 @@
-# Greenstone SWIFT DDS 2.0 <img src="https://nwzimg.wezhan.cn/contents/sitefiles2049/10245019/images/37839368.png" width="29" height="25" >
+# Greenstone SWIFT DDS 3.0.5 <img src="https://nwzimg.wezhan.cn/contents/sitefiles2049/10245019/images/37839368.png" width="29" height="25" >
 
 <div style="text-align: center;">
 <a href="https://www.greenstonesoft.com/"><img src="https://nwzimg.wezhan.cn/contents/sitefiles2049/10245019/images/37867159.png" style="display: inline-block;" hspace="8" vspace="2" width="142" height="40" ></a>
@@ -7,7 +7,7 @@
 
 *SWIFT DDS* is a C++ implementation of the Data Distribution Service (DDS) standard, specified by the Object Management Group (OMG), and developed by Greenstone Soft Co., Ltd. Beijing China. With its reliability and high performance, SWIFT DDS is suitable for critical systems in industries such as autonomous vehicles, aerospace, robotics, and the industrial internet of things.
 
-This repository provides an evaluation version of SWIFT DDS with a time limit of 4 hours. It is specifically offered for users to facilitate rapid software validation for constructing distributed systems on various hardware platforms and operating systems. 
+This repository provides an community version of SWIFT DDS. It is specifically offered for users to facilitate rapid software validation for constructing distributed systems on various hardware platforms and operating systems. 
 
 ## Features
 
@@ -28,10 +28,11 @@ The repository offers a variety of dynamic libraries to support various platform
 
 |  Operating System   |  CPU  |  Compiler  |  Hardware  |
 |  ----  | ---- |  ----  | ---- |
-| Ubuntu 18.04.1 LTS  | x86-64 |  gcc 7.5.0  |  X64 machine  |
-| ARM Linux  | aarch64 |  aarch64-linux-gnu-gcc 7.5.0  | J3/J5, ZU5, S32G, Orin, RPi4B |
-| ARM Linux  | aarch64 |  aarch64-none-linux-gnu-gcc 9.2  | TDA4 |
-| QNX 7.1.0  | aarch64 |  gcc_ntoaarch64le 8.3.0  | Orin, RPi4B |
+| Ubuntu 18.04 LTS  | x86-64 |  gcc 7.5.0  |  X64 machine  |
+| Ubuntu 20.04 LTS  | x86-64 |  gcc 9.4.0  |  X64 machine  |
+| Ubuntu 22.04 LTS  | x86-64 |  gcc 11.4.0  |  X64 machine  |
+| Ubuntu 24.04 LTS  | x86-64 |  gcc 13.2.0  |  X64 machine  |
+| ARM Linux  | aarch64 |  aarch64-linux-gnu-gcc 9.3.0  | TDA4, J3/J5, ZU5, S32G, Orin, RPi4B |
 
 ## Repo structure 
 #### demo folder
@@ -40,6 +41,8 @@ Five demos are included. This can be the start point for developing DDS applicat
 This folder contains header files for Greenstone implementations of DCPS(Data-Centric Publish-Subscribe) and RTPS(Real Time Publish Subscribe protocol), completely in accordance with OMG standards. How to include the header files are illustrated in demo applications.  
 #### lib folder
 This folder contains greenstone-DCPS dynamic-link libraries which need to be linked when building excutables of SWIFT DDS based applications. Various cpu architectures are supported.  
+#### package folder
+This folder contains the deb installation package of SWIFT DDS and can be installed using the sudo dpkg -i *.deb command. Various cpu architectures are supported.  
 #### tools folder
 This folder contains idlparser that is used to generate type related files. Please refer to the readme in the folder.  
 #### utils folder
@@ -54,7 +57,7 @@ This folder contains various utility classes and interfaces. It provides basic f
 
 ## Disclaimer
 
-The evaluation version of SWIFT DDS is licensed solely for the purpose of internal evaluation and testing. Users are strictly prohibited from transferring, distributing, sub-licensing, or deploying it outside the testing environment. Under no circumstances may the users use the evaluation version of SWIFT DDS for commercial, development, or production purposes. Failure to comply with this disclaimer may result in legal actions.
+The community version of SWIFT DDS is licensed solely for the purpose of internal evaluation and testing. Users are strictly prohibited from transferring, distributing, sub-licensing, or deploying it outside the testing environment. Under no circumstances may the users use the evaluation version of SWIFT DDS for commercial, development, or production purposes. Failure to comply with this disclaimer may result in legal actions.
 
 ## Support
 

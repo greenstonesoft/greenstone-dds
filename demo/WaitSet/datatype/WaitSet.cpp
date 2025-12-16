@@ -1,59 +1,17 @@
 /**************************************************************
 * @file WaitSet.cpp
-* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2023
+* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2025
 * All rights reserved
 **************************************************************/
 
 #include "WaitSet.h"
-#include "rtps/CdrSize.h"
+#include "swiftdds/rtps/CdrSize.h"
 //#include <iostream>
 
 WaitSet::WaitSet()
 {
 	m_id = 0;
 	m_index = 0;
-
-	m_payloadHeader.representation_identifier[0] = 1;
-	m_payloadHeader.representation_identifier[1] = 0;
-	m_payloadHeader.representation_options[0] = 0;
-	m_payloadHeader.representation_options[1] = 0;
-}
-WaitSet::~WaitSet()
-{
-}
-WaitSet::WaitSet(const WaitSet &x)
-{
-	m_id = x.m_id;
-	m_index = x.m_index;
-	m_message = x.m_message;
-
-	m_payloadHeader = x.m_payloadHeader;
-}
-WaitSet::WaitSet(WaitSet &&x)
-{
-	m_id = x.m_id;
-	m_index = x.m_index;
-	m_message = std::move(x.m_message);
-
-	m_payloadHeader = x.m_payloadHeader;
-}
-WaitSet& WaitSet::operator=(const WaitSet &x)
-{
-	m_payloadHeader = x.m_payloadHeader;
-
-	m_id = x.m_id;
-	m_index = x.m_index;
-	m_message = x.m_message;
-	return *this;
-
-}
-WaitSet& WaitSet::operator=(WaitSet &&x)
-{
-	m_payloadHeader = x.m_payloadHeader;
-	m_id = x.m_id;
-	m_index = x.m_index;
-	m_message = std::move(x.m_message);
-	return *this;
 
 }
 
@@ -65,6 +23,23 @@ DdsCdr& WaitSet::serialize(DdsCdr &cdr) const
 
 	return cdr;
 }
+uint32_t WaitSet::serialize(void *const data, char *const payload_buf, uint32_t const payload_len)
+{
+	if((data == nullptr) || (payload_buf == nullptr) || (payload_len == 0U))
+	{
+		return 0U;
+	}
+	greenstone::dds::SerializedPayloadHeader const header{get_serialized_payload_header()};
+	memcpy(payload_buf, &header, 4U);
+	DdsCdr cdr;
+	cdr.set_buf(payload_buf, payload_len);
+	cdr.move_length(payload_len-4U);
+	WaitSet* pData = static_cast<WaitSet*>(data);
+	cdr.serialize(*pData);
+	void *addr{nullptr};
+	return cdr.get_buf(&addr);
+}
+
 DdsCdr& WaitSet::deserialize(DdsCdr &cdr)
 {
 	cdr.deserialize(m_id);
@@ -73,6 +48,15 @@ DdsCdr& WaitSet::deserialize(DdsCdr &cdr)
 
 	return cdr;
 }
+bool WaitSet::deserialize(char *const payload_buf, uint32_t const payload_len, void *const data)
+{
+	WaitSet* pData = static_cast<WaitSet*>(data);
+	DdsCdr cdr;
+	cdr.set_buf(payload_buf, payload_len);
+	cdr.deserialize(*pData);
+	return true;
+}
+
 bool WaitSet::is_key_defined()
 {
 	return true;
@@ -85,10 +69,11 @@ void WaitSet::serialize_key(DdsCdr &cdr) const
 }
 void WaitSet::serialize_key(char **buf,unsigned int *len)
 {
+	static greenstone::dds::SerializedPayloadHeader payloadHeader{{0x00,0x01},{0x00,0x00}};
 	if(is_key_serialize_by_cdr())
 	{
 		DdsCdr cdr;
-		cdr.init(m_payloadHeader);
+		cdr.init(payloadHeader);
 		serialize_key(cdr);
 		*len = cdr.get_buf(reinterpret_cast<void**>(buf));
 	}
@@ -117,7 +102,18 @@ uint32_t WaitSet::max_align_size(uint32_t const _cur_al) const
 	return maxSize;
 
 }
-void WaitSet::id(unsigned short _id)
+greenstone::dds::SerializedPayloadHeader const WaitSet::get_serialized_payload_header()
+{
+	static greenstone::dds::SerializedPayloadHeader const header {{0x00,0x01},{0x00,0x00}};    // PLAIN_CDR, LITTLE_ENDIAN
+	return header;
+
+}
+void WaitSet::set_key_val(WaitSet const* const _data) noexcept
+{
+	this->m_id = _data->m_id;
+
+}
+void WaitSet::id(unsigned short const _id)
 {
 	m_id = _id;
 }
@@ -130,7 +126,7 @@ unsigned short& WaitSet::id()
 	return m_id;
 }
 
-void WaitSet::index(uint32_t _index)
+void WaitSet::index(uint32_t const _index)
 {
 	m_index = _index;
 }
@@ -143,7 +139,7 @@ uint32_t& WaitSet::index()
 	return m_index;
 }
 
-void WaitSet::message(const std::string &_message)
+void WaitSet::message(std::string const &_message)
 {
 	m_message = _message;
 }
@@ -151,7 +147,7 @@ void WaitSet::message(std::string &&_message)
 {
 	m_message = std::move(_message);
 }
-const std::string& WaitSet::message() const
+std::string const& WaitSet::message() const
 {
 	return m_message;
 }

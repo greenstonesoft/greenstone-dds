@@ -58,49 +58,51 @@ namespace {
 
 gvoid_t GeneralParticipantListener::on_participant_matched(
     greenstone::dds::DomainParticipant* participant, 
+    dds::topic::ParticipantBuiltinTopicData const &a_remoteData, 
     greenstone::dds::RemoteParticipantInfo const &remoteInfo) noexcept
 {
-    auto userData = remoteInfo.data().user_data().value();
-    if (userData.size() == 0)
-    {        
-        if (remoteInfo.status() == greenstone::dds::RemoteParticipantStatus::ONLINE)
-        {
-            m_matched++;
-            std::cout << "[GSDDS on_participant_matched] A new participant with ID of " 
-                      << remoteInfo.instance_handle() << " has been matched." << std::endl;
-        } 
-        else if (remoteInfo.status() == greenstone::dds::RemoteParticipantStatus::OFFLINE) 
-        {
-            m_matched--;
-            std::cout << "[GSDDS on_participant_matched] A participant with ID of " 
-                      << remoteInfo.instance_handle() << " just left and has been unmatched." << std::endl;
-        }
-    }
-    else
-    {
-        if (remoteInfo.status() == greenstone::dds::RemoteParticipantStatus::ONLINE)
-        {
-            m_matched++;
-            std::cout << "[GSDDS on_participant_matched] A new participant with ID of " 
-                      << remoteInfo.instance_handle() << " and Info of ";
-            for (auto& e : userData)
-            {
-                std::cout << e;
-            }
-            std::cout << " has been matched." << std::endl;
-        } 
-        else if (remoteInfo.status() == greenstone::dds::RemoteParticipantStatus::OFFLINE) 
-        {
-            m_matched--;
-            std::cout << "[GSDDS on_participant_matched] A participant with ID of " 
-                      << remoteInfo.instance_handle() << " and Info of ";
-            for (auto& e : userData)
-            {
-                std::cout << e;
-            }
-            std::cout << " just left and has been unmatched." << std::endl;
-        }
-    }
+    std::cout << "on participant matched.\n" << std::endl;
+    // auto userData = remoteInfo.data().user_data().value();
+    // if (userData.size() == 0)
+    // {        
+    //     if (remoteInfo.status() == greenstone::dds::RemoteParticipantStatus::ONLINE)
+    //     {
+    //         m_matched++;
+    //         std::cout << "[GSDDS on_participant_matched] A new participant with ID of " 
+    //                   << remoteInfo.instance_handle() << " has been matched." << std::endl;
+    //     } 
+    //     else if (remoteInfo.status() == greenstone::dds::RemoteParticipantStatus::OFFLINE) 
+    //     {
+    //         m_matched--;
+    //         std::cout << "[GSDDS on_participant_matched] A participant with ID of " 
+    //                   << remoteInfo.instance_handle() << " just left and has been unmatched." << std::endl;
+    //     }
+    // }
+    // else
+    // {
+    //     if (remoteInfo.status() == greenstone::dds::RemoteParticipantStatus::ONLINE)
+    //     {
+    //         m_matched++;
+    //         std::cout << "[GSDDS on_participant_matched] A new participant with ID of " 
+    //                   << remoteInfo.instance_handle() << " and Info of ";
+    //         for (auto& e : userData)
+    //         {
+    //             std::cout << e;
+    //         }
+    //         std::cout << " has been matched." << std::endl;
+    //     } 
+    //     else if (remoteInfo.status() == greenstone::dds::RemoteParticipantStatus::OFFLINE) 
+    //     {
+    //         m_matched--;
+    //         std::cout << "[GSDDS on_participant_matched] A participant with ID of " 
+    //                   << remoteInfo.instance_handle() << " and Info of ";
+    //         for (auto& e : userData)
+    //         {
+    //             std::cout << e;
+    //         }
+    //         std::cout << " just left and has been unmatched." << std::endl;
+    //     }
+    // }
 }
 
 void GeneralReaderListener::on_subscription_matched(
@@ -168,14 +170,14 @@ void GeneralReaderListener::on_sample_rejected(
               << "; last_instance_handle: " << status.last_instance_handle() << std::endl;
 };
 
-void GeneralReaderListener::on_sample_lost(
-    greenstone::dds::DataReader* reader,
-    greenstone::dds::SampleLostStatus const& status) noexcept
-{
-    std::cout << "[GSDDS on_sample_lost] topic: " << reader->get_topicdescription()->get_name()
-              << "; total_count: " << status.total_count()
-              << "; total_count_change: " << status.total_count_change() << std::endl;
-};
+// void GeneralReaderListener::on_sample_lost(
+//     greenstone::dds::DataReader* reader,
+//     greenstone::dds::SampleLostStatus const& status) noexcept
+// {
+//     std::cout << "[GSDDS on_sample_lost] topic: " << reader->get_topicdescription()->get_name()
+//               << "; total_count: " << status.total_count()
+//               << "; total_count_change: " << status.total_count_change() << std::endl;
+// };
 
 void GeneralWriterListener::on_publication_matched(
     greenstone::dds::DataWriter* writer,

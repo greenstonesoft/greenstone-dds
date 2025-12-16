@@ -11,7 +11,7 @@
 #include "Latency.h"
 #include "LatencyTopicDataType.h"
 #include "GeneralListeners.h"
-#include "dcps/SwiftDdsExport.h"
+#include "swiftdds/dcps/SwiftDdsExport.h"
 #include "LatencySubBase.h"
 
 /**
@@ -41,7 +41,7 @@ private:
 		~SubReaderListener();
 
         // receive data and resend to publisher
-		void on_data_available(greenstone::dds::DataReader* reader) noexcept;
+		void on_data_available(greenstone::dds::DataReader* reader) noexcept override;
 	private:
 		LatencySub* m_up;
 		greenstone::dds::DataWriter* m_writerEcho;

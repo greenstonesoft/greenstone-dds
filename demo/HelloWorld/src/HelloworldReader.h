@@ -36,7 +36,7 @@ public:
 private:
 
     // Instance of HelloworldTopicDataType
-    HelloworldTopicDataType m_helloworldTopicType;
+    HelloWorldTopicDataType m_helloworldTopicType;
 
     // DDS entities for the DataReader
     greenstone::dds::DomainParticipant* m_participant;
@@ -52,7 +52,7 @@ private:
     public:
         MyDataReaderListener() {}
         ~MyDataReaderListener() {}
-        void on_data_available(greenstone::dds::DataReader* reader) noexcept;
+        void on_data_available(greenstone::dds::DataReader* reader) noexcept override;
     public:
         uint32_t m_received {0};
     }* m_readerListener;

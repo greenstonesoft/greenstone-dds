@@ -2,7 +2,7 @@ This demo showcases the deployment of SWIFT DDS to send and receive data using a
 
 Follow the steps below to run this demo. Cmake with version equal or greater than 3.5 is required.
 
-**Step 1**: Run the following commands to compile the project. Set ***TARGET_OS*** by adding *'-D TARGET_OS=<target_os>'* when executing *'cmake ..'* accroding the platform. There are four available values for ***TARGET_OS***, which correspond to different platforms: **LINUX_X86 (default)**, **LINUX_ARM**, **LINUX_TDA4**, and **QNX_ARM**. Upon successful compilation, an executable file named *TestWaitSet* will be generated.
+**Step 1**: Run the following commands to compile the project. Set ***TARGET_OS*** by adding *'-D TARGET_OS=<target_os>'* when executing *'cmake ..'* accroding the platform. There are four available values for ***TARGET_OS***, which correspond to different platforms: **LINUX_X86_18 (default)**, **LINUX_X86_20**, **LINUX_X86_22**, **LINUX_X86_24**, and **LINUX_ARM**. Upon successful compilation, an executable file named *TestWaitSet* will be generated.
 
 > mkdir build  
 > cd build  

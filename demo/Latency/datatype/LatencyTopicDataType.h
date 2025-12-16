@@ -1,15 +1,17 @@
 /**************************************************************
 * @file LatencyTopicDataType.h
-* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2023
+* @copyright GREENSTONE TECHNOLOGY CO.,LTD. 2020-2025
 * All rights reserved
 **************************************************************/
 
-#ifndef LATENCY_TOPICDATATYPE_H
-#define LATENCY_TOPICDATATYPE_H
+#ifndef LATENCYTOPICDATATYPE_586b7204b4377df7a2a4bda4a9503736_H
+#define LATENCYTOPICDATATYPE_586b7204b4377df7a2a4bda4a9503736_H
 
-#include "dcps/SwiftDdsExport.h"
+#include "swiftdds/dcps/SwiftDdsExport.h"
 
 #include "Latency.h"
+
+
 
 
 /**
@@ -30,15 +32,21 @@ public:
 	bool deserialize(DdsCdr& cdr, std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value, void* data);
 
 	// The func of getKey is non-thread-safe
-	bool get_key(void* data, InstanceHandle_t* ihandle);
-	bool get_key(std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value, InstanceHandle_t* ihandle);
-	bool init_data_ptr(void* data);
-	uint32_t get_cdr_serialized_size(void *data);
-	bool is_with_key();
-	bool is_plain_types();
-	void* create_data_resource();
-	void release_data_resource(void *data);
+	bool get_key(void* data, InstanceHandle_t* ihandle) noexcept;
+	bool get_key(std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value, InstanceHandle_t* ihandle) noexcept;
+	bool init_data_ptr(void* data) noexcept;
+	uint32_t get_cdr_serialized_size(void *data) noexcept;
+	bool is_with_key() noexcept;
+	bool is_plain_types() noexcept;
+	void* create_data_resource() noexcept;
+	void release_data_resource(void *data) noexcept;
+	greenstone::dds::SerializedPayloadHeader const get_serialized_payload_header() noexcept;
+	void* const get_key_value_data(void * const data) noexcept;
+	void* const get_key_value_data(std::shared_ptr<greenstone::dds::SerializedPayload_t> data_value) noexcept;
+	void copy_key_value_to_data(void const *const key_data, void *const data) noexcept;
+	uint32_t data_size_of() noexcept;
 
 };
 
-#endif	// LATENCY_TOPICDATATYPE_H
+#endif	// LATENCYTOPICDATATYPE_586b7204b4377df7a2a4bda4a9503736_H
+

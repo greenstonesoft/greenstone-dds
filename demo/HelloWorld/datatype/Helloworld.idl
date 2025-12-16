@@ -1,4 +1,4 @@
-struct Helloworld
+struct HelloWorld
 {
     @key unsigned short id;
     unsigned long index;

@@ -11,7 +11,7 @@
 #include <list>
 #include <fstream>
 #include "json.hpp"
-#include "dcps/SwiftDdsExport.h"
+#include "swiftdds/dcps/SwiftDdsExport.h"
 
 using json = nlohmann::json;
 
@@ -167,6 +167,13 @@ private:
         json& jNumber, 
         const std::string& key1, 
         const std::string& key2 = "");
+
+    // Get number sequence from json
+    template <typename T>
+    std::array<T, 100> get_number_sequence(
+        T defaultValue,
+        json& jSeq, 
+        const std::string& key1);
 
     // Get enum value from json
     template <typename T>

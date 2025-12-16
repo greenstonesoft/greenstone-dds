@@ -10,7 +10,7 @@
 void HelloworldReader::MyDataReaderListener::on_data_available(greenstone::dds::DataReader* reader) noexcept
 {
     // User can modify the logic here for data received
-    Helloworld helloworld;
+    HelloWorld helloworld;
     greenstone::dds::SampleInfo info;
     
     if (reader->take_next_sample(&helloworld, info) == greenstone::dds::ReturnCode_t::RETCODE_OK)
@@ -47,7 +47,7 @@ bool HelloworldReader::init(const std::string& topicName)
 {
     // Create participant
     m_participant = ConfigParser::get_instance()->get_participant_from_json(
-        "participant_sub_cfg", m_participantListener, m_mask);
+        "participant_sub_cfg", nullptr, m_mask);
     if (m_participant == nullptr)
     {
         return false;

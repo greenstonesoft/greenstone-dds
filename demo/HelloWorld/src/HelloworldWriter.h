@@ -43,8 +43,8 @@ public:
 private:
 
     // Instance of HelloWorld and HelloworldTopicDataType
-    Helloworld m_helloworld;
-    HelloworldTopicDataType m_helloworldTopicType;
+    HelloWorld m_helloworld;
+    HelloWorldTopicDataType m_helloworldTopicType;
 
     // DDS entities for DataWriter
     greenstone::dds::DomainParticipant* m_participant;
