@@ -1,26 +1,44 @@
 # Greenstone SWIFT DDS 3.0 <img src="https://nwzimg.wezhan.cn/contents/sitefiles2049/10245019/images/37839368.png" width="29" height="25" >
 
 <div style="text-align: center;">
-<a href="https://www.greenstonesoft.com/"><img src="https://nwzimg.wezhan.cn/contents/sitefiles2049/10245019/images/37867159.png" style="display: inline-block;" hspace="8" vspace="2" width="142" height="40" ></a>
+<a href="https://www.greenstonesoft.com/en_homepage"><img src="https://nwzimg.wezhan.cn/contents/sitefiles2049/10245019/images/37867159.png" style="display: inline-block;" hspace="8" vspace="2" width="142" height="40" ></a>
 </div>
 
 
-*SWIFT DDS* is a C++ implementation of the Data Distribution Service (DDS) standard, specified by the Object Management Group (OMG), and developed by Greenstone Soft Co., Ltd. Beijing China. With its reliability and high performance, SWIFT DDS is suitable for critical systems in industries such as autonomous vehicles, aerospace, robotics, and the industrial internet of things.
+*SWIFT DDS* is a C++ implementation of the Data Distribution Service (DDS) standard, specified by the Object Management Group (OMG), and developed by Greenstone Technology Co., Ltd. Beijing China. With its reliability and high performance, SWIFT DDS is suitable for critical systems in industries such as autonomous vehicles, aerospace, robotics, and the industrial internet of things.
 
-This repository provides an community version of SWIFT DDS. It is specifically offered for users to facilitate rapid software validation for constructing distributed systems on various hardware platforms and operating systems. 
+This repository provides the community version of SWIFT DDS. It is specifically offered for users to facilitate rapid software validation for constructing distributed systems on various hardware platforms and operating systems. 
 
 ## Features
 
-SWIFT DDS offers a broad range of essential capabilities, including:
-- Full compliance with the DCPS and RTPS standards
-- Decoupling between the application layer and operating system layer
-- Support for various transport modes, such as UDP, TCP, Shared Memory, Zero Copy, and Inter-processor communication (IPC)
-- Real-time data transmission with low latency
-- Abundant Quality-of-Service (QoS) policies for service customization
-- Support for both synchronous and asynchronous interaction modes
-- Plug-and-Play connectivity 
-- Scalability to facilitate systems scaling to large networks
-- A distributed framework that avoids a single point of failure
+### Remarkable Performance & High reliability
+- Commercial DDS product with 6 years of R&D and verifications by projects from OEMs and Tier1’s
+- Proprietary deterministic execution/communication technology, guarantee the real-time data communication
+- Low overhead and high throughput
+- Efficient resource utilization
+### Industry-Leading Safety Guarantees
+- ISO 26262 ASIL-D functional safety product certification
+- Suitable for safety-critical applications in autonomous driving
+- Compliant with MISRA C/C++ coding standards and pass static code analysis in QAC
+- Comprehensive tests (unit, integration, embedded, and fault injection) achieving 100% safety requirements coverage and mandatory MC/DC code coverage, as required by ISO 26262 ASIL-D certification
+### Minimum Dependency
+- No third-party codes included
+- Can be easily customized/extended according to users’ needs
+- Support a wide range of SoC/OS and MCU/RTOS. Easy for cross-platform porting
+### Full DDS Standard Compliance and performance-enhancing extensions
+- Full compliance with DDS standard specifications
+- Support for all DDS QoS policies
+- Seamless interoperability with other DDS implementations
+- Supported Customized Features:
+  - ZeroCopy: Enables direct data transfer mechanisms to eliminate unnecessary memory copying operations
+  - Inter-core communication: Support direct inter-core communication on heterogeneous chips (Horizon Robotics Journal 6, TDA4, S32G, etc.) such as arm A Core with R Core and arm A Core with M Core
+  - UDP_FlowControl: Supports configuring DataWriter transmission and DataReader reception bandwidth at the process level, with flexible options to set either individually or simultaneously—the most restrictive flow limit will take effect
+  - PreferTransportOrder: Dynamically selects the optimal communication channel based on the configured channel priority order
+  - NetworkPortRangeQoSPolicy: Restricts processes to operate within a specified UDP port range
+  - ThreadInstanceConfigQoSPolicy: When enabled, elevates thread resources from the participant level to the process level, reducing the number of threads created for nodes
+### Comprehensive toolchains that further accelerate system integration
+- Developers only need to focus on the intelligent driving logic and algorithms. Compatible with common intelligent driving chips, help fast integration and verification of intelligent driving products
+
 
 ## Cross-Platform
 
@@ -63,7 +81,6 @@ The community version of SWIFT DDS is licensed solely for the purpose of interna
 
 Please feel free to leave any feedbacks or ask for software supports. Users can either raise issues in this repo or contact gitsupport@greenstonesoft.com for support.
 
-Apart from SWIFT DDS, greenstone also provides SWIFT DDS-RT, which is specifically designed to run on resource-limited hardware, such as embedded MCUs. SWIFT DDS-RT has received the ISO 26262 ASIL-D Functional Safety certification, making it well suited for application scenarios that have high functional safety requirements. 
+For MCUs or ARM R/M architectures, greenstone also provides SWIFT DDS-RT, which is specifically designed to run on resource-limited hardware. Unlike some MCU implementations that adopt DDS-XRCE protocol, DDS-RT is a full DDS protocol implementation with all the standard API's and Qos.
 
-For the full version of SWIFT DDS/SWIFT DDS-RT, or any commercial cooperating inquiries, please contact bd@greenstonesoft.com.
-
+For the commercial version of SWIFT DDS/SWIFT DDS-RT, or any commercial cooperating inquiries, please contact bd@greenstonesoft.com.
