@@ -2,13 +2,17 @@ This demo showcases the method to test the network latency performance of Greens
 
 Follow the steps below to run this demo. Cmake with version equal or greater than 3.5 is required.
 
-**Step 1**: Run the following commands to compile the project. Set ***TARGET_OS*** by adding *'-D TARGET_OS=<target_os>'* when executing *'cmake ..'* accroding the platform. There are four available values for ***TARGET_OS***, which correspond to different platforms: **LINUX_X86_18 (default)**, **LINUX_X86_20**, **LINUX_X86_22**, **LINUX_X86_24**, and **LINUX_ARM**. Upon successful compilation, an executable file named *Latency* will be generated.
+**Step 1**: Run the following commands to compile the project. 
+
+For platforms other than Windows: Set ***TARGET_OS*** by adding *'-D TARGET_OS=<target_os>'* when executing *'cmake ..'* accroding the platform. There are four available values for ***TARGET_OS***, which correspond to different platforms: **LINUX_X86_18 (default)**, **LINUX_X86_20**, **LINUX_X86_22**, **LINUX_X86_24**, and **LINUX_ARM**. Upon successful compilation, an executable file named *Latency* will be generated.
 
 > mkdir build  
 > cd build  
 > cmake ..   
 > make -j8  
 > cd ..
+
+For the Windows platform: Open the local folder using **Visual Studio 2019 or a later version** , then navigate to and open the folder **greenstone-dds\demo\Latency**. Open the **CMakeSettings.json** file, select **Release** as the configuration type, set the value of CMake command arguments to **-DTARGET_OS=WIN_64**, and press Ctrl+S to save the configuration. Wait for CMake in Visual Studio to complete automatic generation. If Visual Studio does not select it automatically, select **Latency.exe** as the startup item. Click the **Build** option in the menu bar and select **"Build Latency.exe"** from the pop-up list. Upon successful compilation, an executable file named *Latency.exe* will be generated.
 
 **Step 2**: Modify the *config.json* file by filling ***local_host*** and ***transport_locator_list*** with the IP address that will be used for the communication. Port number is optional. Additionly, ensure that the ***domain_id*** is set to the same value for all the participants involved in the communication. 
 
@@ -17,6 +21,8 @@ To choose the communication mode, adjust the ***prefer_transport_kind*** and ***
 Modify the *payload.txt* to test the network latency performance under varied settings of ***payload_size*** and ***payload_count***.
 
 **Step 3**: Run latency test.  
+
+For platforms other than Windows:
 
 Specify the ***LD_LIBRARY_PATH*** environment variable to include the directory where the corresponding dynamic library of SWIFT DDS is located.
 > export LD_LIBRARY_PATH=<library_path>:$LD_LIBRARY_PATH
@@ -29,6 +35,20 @@ For receiver:
 
 The full command options can be checked by:
 > ./Latency -h
+
+For the Windows platform: 
+
+Specify the ***PATH*** environment variable to include the directory where the corresponding dynamic library of SWIFT DDS is located.
+> $env:PATH += ";<library_path>"
+
+For sender:
+> .\Latency.exe -n pub
+
+For receiver:  
+> .\Latency.exe -n sub
+
+The full command options can be checked by:
+> .\Latency.exe -h
 
 The test result will be presented in the format below including [Payload Size, Received Count, Loss Rate, Average, Maximum, Minimum, Median, Standard Deviation].  
 > Payload:         16  B | Received:     500000 | Loss Rate:       0.00 % | latencyAvg:          6 us | latencyMax:          9 us | latencyMin:          6 us | latencyMed:          6 us | latencyStd:          9 us |  

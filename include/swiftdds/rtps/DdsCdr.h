@@ -2141,7 +2141,7 @@ public:
                                      std::is_floating_point<UnderlyingT>::value};
     };
 
-    template <class _Tp>
+    template <class _Tp, typename = gvoid_t>
     class Primitive
     {
     private:
@@ -2151,11 +2151,16 @@ public:
             TYPE_SIZE == 1, guint8_t,
             typename std::conditional<
                 TYPE_SIZE == sizeof(guint16_t), guint16_t,
-                typename std::conditional<
-                    TYPE_SIZE == sizeof(guint32_t), guint32_t,
-                    typename std::conditional<TYPE_SIZE == sizeof(guint64_t), guint64_t,
-                                              typename std::conditional<TYPE_SIZE == sizeof(gfloat128_t), gfloat128_t,
-                                                                        gvoid_t>::type>::type>::type>::type>::type;
+                typename std::conditional<TYPE_SIZE == sizeof(guint32_t), guint32_t,
+                                          typename std::conditional<TYPE_SIZE == sizeof(guint64_t), guint64_t,
+                                                                    gvoid_t>::type>::type>::type>::type;
+    };
+
+    template <class _Tp>
+    class Primitive<_Tp, typename std::enable_if<std::is_same<_Tp, gfloat128_t>::value, gvoid_t>::type>
+    {
+    public:
+        using Type = gfloat128_t;
     };
 
     template <class _Tp, class _Up = bool>

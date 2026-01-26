@@ -35,8 +35,9 @@ enum class RecvMode_t : gint32_t
 enum class LocalMode : gint32_t
 {
     TURN_OFF = 0,
-    TURN_ON = 1,
-    // ALL_MSG = 2
+    TURN_ON_SYNC = 1,
+    TURN_ON_ASYNC = 2,
+    // ALL_MSG = 3
 };
 
 /**
@@ -867,7 +868,7 @@ public:
      */
     inline bool local_mode_is_on() const noexcept
     {
-        return m_localMode == LocalMode::TURN_ON;
+        return m_localMode != LocalMode::TURN_OFF;
     }
 
     /**
@@ -1074,7 +1075,7 @@ private:
     gbool_t m_enableMonitoring {false};
     gbool_t m_enableDistlog {false};
 
-    LocalMode m_localMode {LocalMode::TURN_ON};
+    LocalMode m_localMode {LocalMode::TURN_ON_ASYNC};
 
     dds::qos::ConcurrencyControlQosPolicy m_concurrencyControl{};
 

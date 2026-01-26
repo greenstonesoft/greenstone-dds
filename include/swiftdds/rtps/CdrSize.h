@@ -12,6 +12,8 @@
 #include <map>
 #include <string>
 
+#include "swiftdds/dcps/PITypes.h"
+
 namespace gstone
 {
 namespace rtps
@@ -62,6 +64,11 @@ typename std::enable_if<std::is_floating_point<T>{},bool>::type = true>
 inline static std::size_t alignment(std::size_t const cur_al, T const &val) noexcept
 {
     return alignment_bytes(cur_al, sizeof(T));
+}
+
+inline static std::size_t alignment(std::size_t const cur_al, gfloat128_t const &val) noexcept
+{
+    return alignment_bytes(cur_al, 16U);
 }
 
 /**

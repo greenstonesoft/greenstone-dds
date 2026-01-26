@@ -118,11 +118,29 @@ namespace domain
          * @param [in] a_listener Topic's listener
          * @param [in] a_mask Communication status mask.
          * @return Return a pointer of a newly created Topic or nullptr.
-         */ 
-        dds::topic::Topic* create_topic(gstring_t const& a_topic_name, gstring_t const& a_type_name,
-            dds::topic::TopicQos a_topic_qos,
-            dds::topic::TopicListener* const a_listener = nullptr, DDS::StatusMask const a_mask = DDS::EmptyStatusMask) noexcept;
-        
+         */
+        dds::topic::Topic *create_topic(gstring_t const &a_topic_name, gstring_t const &a_type_name,
+                                        dds::topic::TopicQos a_topic_qos,
+                                        dds::topic::TopicListener *const a_listener = nullptr,
+                                        DDS::StatusMask const a_mask = DDS::EmptyStatusMask) noexcept;
+
+        /**
+         * @brief This operation creates a Topic.
+         * @details The Topic is bound to a type described by the type_name argument. Prior to creating a
+         * Topic the type must have been registered with the Service.
+         * @param [in] a_topic_name Topic's name
+         * @param [in] a_type_name The name of type registed by register_type.
+         * @param [in] a_type_identifier The name of type identifier by register_type.
+         * @param [in] a_topic_qos Topic's qos
+         * @param [in] a_listener Topic's listener
+         * @param [in] a_mask Communication status mask.
+         * @return Return a pointer of a newly created Topic or nullptr.
+         */
+        dds::topic::Topic *create_topic(gstring_t const &a_topic_name, gstring_t const &a_type_name,
+                                        gstring_t const &a_type_identifier, dds::topic::TopicQos a_topic_qos,
+                                        dds::topic::TopicListener *const a_listener = nullptr,
+                                        DDS::StatusMask const a_mask = DDS::EmptyStatusMask) noexcept;
+
         /**
          * @brief The function registers a TopicDataType or a DynamicTopicDataType.
          * @param [in] a_type Const pointer of a TopicDataType object.
@@ -140,7 +158,7 @@ namespace domain
          * @param [in] a_type Const reference of a TopicDataType object.
          * @return Return true or false.
          * @retval true  If there is a Type used a_type existing, it will return true.
-         * @retval false If there is not a Type used a_type existing, it will return true.
+         * @retval false If there is not a Type used a_type existing, it will return false.
          */ 
         gbool_t is_type_registered(dds::topic::TopicDataType const *const a_type) noexcept;
         
@@ -149,9 +167,19 @@ namespace domain
          * @param [in] a_type_name type_name
          * @return Return true or false.
          * @retval true  If there is a Type named a_type_name existing, it will return true.
-         * @retval false If there is not a Type named a_type_name existing, it will return true.
+         * @retval false If there is not a Type named a_type_name existing, it will return false.
          */ 
         gbool_t is_type_registered(gstring_t const& a_type_name) noexcept;
+
+        /**
+         * @brief This function checks whether or not existing a TopicDataType or a DynamicTopicDataType using type_name.
+         * @param [in] a_type_name type_name
+         * @param [in] a_type_identifier type_identifier
+         * @return Return true or false.
+         * @retval true  If there is a Type named a_type_name and a Type identifier named a_type_identifier existing, it will return true.
+         * @retval false If there is not a Type named a_type_name and a Type identifier named a_type_identifier existing, it will return false.
+         */ 
+        gbool_t is_type_registered(gstring_t const& a_type_name, gstring_t const& a_type_identifier) noexcept;
         
         /**
          * @brief This function unregisters a TopicDataType or a DynamicTopicDataType by type_name.
@@ -162,6 +190,17 @@ namespace domain
          * objects attached to it, it will return PRECONDITION_NOT_MET.
          */ 
         DDS::ReturnCode_t unregister_type(gstring_t const& a_type_name) noexcept;
+
+        /**
+         * @brief This function unregisters a TopicDataType or a DynamicTopicDataType by type_name.
+         * @param [in] a_type_name TopicDataType's type_name or DynamicTopicDataType's name.
+         * @param [in] a_type_identifier TopicDataType's type_identifier
+         * @return Return DDS::ReturnCode_t.
+         * @retval RETCODE_OK It is successful to unregister type.
+         * @retval RETCODE_PRECONDITION_NOT_MET If the unregister_type operation is called on a TopicType with any of these existing 
+         * objects attached to it, it will return PRECONDITION_NOT_MET.
+         */ 
+        DDS::ReturnCode_t unregister_type(gstring_t const& a_type_name, gstring_t const& a_type_identifier) noexcept;
         
         /**
          * @brief This operation deletes a Topic.

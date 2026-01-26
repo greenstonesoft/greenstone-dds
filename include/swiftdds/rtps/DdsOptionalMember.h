@@ -20,7 +20,7 @@ namespace rtps
 {
 
 template<class _Tp>
-class GS_DDS4CPP_API DdsOptionalMember
+class DdsOptionalMember
 {
 public:
     static constexpr gbool_t HAS_OPTIONAL_OPT{true};

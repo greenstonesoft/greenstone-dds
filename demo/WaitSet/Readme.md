@@ -2,7 +2,9 @@ This demo showcases the deployment of SWIFT DDS to send and receive data using a
 
 Follow the steps below to run this demo. Cmake with version equal or greater than 3.5 is required.
 
-**Step 1**: Run the following commands to compile the project. Set ***TARGET_OS*** by adding *'-D TARGET_OS=<target_os>'* when executing *'cmake ..'* accroding the platform. There are four available values for ***TARGET_OS***, which correspond to different platforms: **LINUX_X86_18 (default)**, **LINUX_X86_20**, **LINUX_X86_22**, **LINUX_X86_24**, and **LINUX_ARM**. Upon successful compilation, an executable file named *TestWaitSet* will be generated.
+**Step 1**: Run the following commands to compile the project. 
+
+For platforms other than Windows: Set ***TARGET_OS*** by adding *'-D TARGET_OS=<target_os>'* when executing *'cmake ..'* accroding the platform. There are four available values for ***TARGET_OS***, which correspond to different platforms: **LINUX_X86_18 (default)**, **LINUX_X86_20**, **LINUX_X86_22**, **LINUX_X86_24**, and **LINUX_ARM**. Upon successful compilation, an executable file named *TestWaitSet* will be generated.
 
 > mkdir build  
 > cd build  
@@ -10,11 +12,15 @@ Follow the steps below to run this demo. Cmake with version equal or greater tha
 > make -j8  
 > cd ..
 
+For the Windows platform: Open the local folder using **Visual Studio 2019 or a later version** , then navigate to and open the folder **greenstone-dds\demo\WaitSet**. Open the **CMakeSettings.json** file, select **Release** as the configuration type, set the value of CMake command arguments to **-DTARGET_OS=WIN_64**, and press Ctrl+S to save the configuration. Wait for CMake in Visual Studio to complete automatic generation. If Visual Studio does not select it automatically, select **TestWaitSet.exe** as the startup item. Click the **Build** option in the menu bar and select **"Build TestWaitSet.exe"** from the pop-up list. Upon successful compilation, an executable file named *TestWaitSet.exe* will be generated.
+
 **Step 2**: Modify the *config.json* file by filling ***local_host*** and ***transport_locator_list*** with the IP address that will be used for the communication. Port number is optional. Additionly, ensure that the ***domain_id*** is set to the same value for all the participants involved in the communication. 
 
 To choose the communication mode, adjust the ***prefer_transport_kind*** and ***only_recv_by_udp*** fields. For UDP, TCP and Shared Memory, set the order of  ***UDPv4***,  ***SHM***, and  ***TCPv4*** in the prefer_transport_kind list. Setting ***only_recv_by_udp*** to **true** means SWIFT DDS can set the communication mode to UDP, regardless of the ***prefer_transport_kind*** setting. Setting ***only_recv_by_udp*** to **false** and  SHM is ranked first in the ***prefer_transport_kind*** list, means SWIFT DDS can automatically optimize the communication mode to Shared Memory if it detects that both publisher and subscriber are on the same machine.
 
 **Step 3**: Create a publisher and a subscriber to achieve communication.  
+
+For platforms other than Windows:
 
 Specify the ***LD_LIBRARY_PATH*** environment variable to include the directory where the corresponding dynamic library of SWIFT DDS is located.
 > export LD_LIBRARY_PATH=<library_path>:$LD_LIBRARY_PATH
@@ -27,6 +33,20 @@ For receiver:
 
 The full command options can be checked by:
 > ./TestWaitSet -h
+
+For the Windows platform: 
+
+Specify the ***PATH*** environment variable to include the directory where the corresponding dynamic library of SWIFT DDS is located.
+> $env:PATH += ";<library_path>"
+
+For sender:
+> .\TestWaitSet.exe -n pub
+
+For receiver:  
+> .\TestWaitSet.exe -n sub
+
+The full command options can be checked by:
+> .\TestWaitSet.exe -h
 
 Matching messages will be printed on the screen if sender and receiver match each other successfully. Otherwise, please double check IP address and domain_id. 
 

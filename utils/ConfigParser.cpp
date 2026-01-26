@@ -128,13 +128,13 @@ ParticipantQosPtr ConfigParser::get_participant_qos_from_json(const char* partic
     tmp = get_locator_list(tmp, jSub, "transport_locator_list");
     for (size_t i = 0; i < tmp.size(); i++)
     {
-        char addr[tmp[i].ADDRESS_SIZE];
+        std::vector<char> addr;
         for (size_t j = 0; j < tmp[i].ADDRESS_SIZE; j++)
         {
-            addr[j] = (char) tmp[i].address()[j];
+            addr.push_back((char) tmp[i].address()[j]);
         }
         
-        participantAttr.add_unicast_transport(tmp[i].kind(), tmp[i].port(), addr);
+        participantAttr.add_unicast_transport(tmp[i].kind(), tmp[i].port(), addr.data());
     }
 
     participantAttr.default_multicast_locatorlist(get_locator_list(

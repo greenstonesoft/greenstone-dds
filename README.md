@@ -51,6 +51,7 @@ The repository offers a variety of dynamic libraries to support various platform
 | Ubuntu 22.04 LTS  | x86-64 |  gcc 11.4.0  |  X64 machine  |
 | Ubuntu 24.04 LTS  | x86-64 |  gcc 13.2.0  |  X64 machine  |
 | ARM Linux  | aarch64 |  aarch64-linux-gnu-gcc 9.3.0  | TDA4, J3/J5, ZU5, S32G, Orin, RPi4B |
+| Windows  | x86-64 |  MSVC 14.20  |  X64 machine  |
 
 ## Repo structure 
 #### demo folder
@@ -59,8 +60,6 @@ Five demos are included. This can be the start point for developing DDS applicat
 This folder contains header files for Greenstone implementations of DCPS(Data-Centric Publish-Subscribe) and RTPS(Real Time Publish Subscribe protocol), completely in accordance with OMG standards. How to include the header files are illustrated in demo applications.  
 #### lib folder
 This folder contains greenstone-DCPS dynamic-link libraries which need to be linked when building excutables of SWIFT DDS based applications. Various cpu architectures are supported.  
-#### package folder
-This folder contains the deb installation package of SWIFT DDS and can be installed using the sudo dpkg -i *.deb command. Various cpu architectures are supported.  
 #### tools folder
 This folder contains idlparser that is used to generate type related files. Please refer to the readme in the folder.  
 #### utils folder

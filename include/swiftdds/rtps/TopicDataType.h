@@ -304,6 +304,16 @@ public:
         return 0U;
     }
 
+    inline gvoid_t type_identifier(std::string const& identifier) noexcept
+    {
+        m_typeIdentifier = identifier;
+    }
+
+    inline std::string const& type_identifier() const noexcept
+    {
+        return m_typeIdentifier;
+    }
+
 protected:
     /**
      * @brief The copy constructor for Duration.
@@ -329,6 +339,7 @@ private:
     gbool_t m_isStaticType;
     std::string m_sTopicDataTypeName;
     gbool_t m_isWithKey;
+    std::string m_typeIdentifier;
 
 };
 

@@ -60,6 +60,12 @@ namespace sub
          * @return unread cache count
          */
         guint64_t const get_unread_cache_count() noexcept;
+
+        /**
+         * @brief Get the unread cache count object
+         * @return unread cache count
+         */
+        guint64_t const get_unread_cache_count(gbool_t mark_as_read) noexcept;
         
         /**
          * @brief Get the untaken cache count object
@@ -181,6 +187,17 @@ namespace sub
          * @retval DDS::ReturnCode_t::RETCODE_BAD_PARAMETER parameters are illegal.
          */
         DDS::ReturnCode_t take_next_sample(void* const data_value, dds::core::SampleInfo& sample_info) noexcept;
+
+        /**
+         * @brief This operation copies the first, non-previously accessed Data value from the DataReader
+         * and 'removes' it from the DataReader so it is no longer accessiblep.[only for ros2]
+         * @param [in,out] data_value The received data
+         * @param [in,out] sample_info The Sample Info
+         * @return DDS::ReturnCode_t 
+         * @retval DDS::ReturnCode_t::RETCODE_OK nothing wrong
+         * @retval DDS::ReturnCode_t::RETCODE_BAD_PARAMETER parameters are illegal.
+         */
+        DDS::ReturnCode_t take_first_sample(void* const data_value, dds::core::SampleInfo& sample_info) noexcept;
 
         /**
          * @brief This operation copies the next, non-previously accessed Data value from the DataReader.
